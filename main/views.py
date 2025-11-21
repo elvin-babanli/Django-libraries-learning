@@ -23,3 +23,6 @@ def get_git(request):
 
 def get_crud(request):
     return render(request,"crud.html")
+
+# Projects______________________________________________
+

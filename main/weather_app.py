@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 
 def fetch_weather(city: str):
-    api_key = getattr(settings, "OPENWEATHER_API_KEY", None)
+    api_key = api_key = settings.OPENWEATHER_API_KEY
     if not api_key:
         return None, "Error: API key not configured in settings.py"
 
