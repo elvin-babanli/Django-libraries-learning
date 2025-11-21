@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}Django CRUD Roadmap{% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <!-- LEFT SIDEBAR -->
+  <div class="col-lg-3 mb-4">
+    <div class="list-group shadow-sm sticky-top" style="top: 80px;">
+      <div class="list-group-item list-group-item-action active">
+        Django CRUD Roadmap
+      </div>
+      <a href="#overview" class="list-group-item list-group-item-action">What is CRUD?</a>
+      <a href="#step0" class="list-group-item list-group-item-action">0) Project Setup</a>
+      <a href="#step1" class="list-group-item list-group-item-action">Step 1: settings.py</a>
+      <a href="#step2" class="list-group-item list-group-item-action">Step 2: Model & Migrations</a>
+      <a href="#step3" class="list-group-item list-group-item-action">Step 3: Admin & Superuser</a>
+      <a href="#step4" class="list-group-item list-group-item-action">Step 4: URLs</a>
+      <a href="#step5" class="list-group-item list-group-item-action">Step 5: Templates & Static</a>
+      <a href="#step6" class="list-group-item list-group-item-action">Step 6: Views (CRUD Logic)</a>
+      <a href="#step7" class="list-group-item list-group-item-action">Step 7: HTML Templates</a>
+      <a href="#step8" class="list-group-item list-group-item-action">Step 8: Run & Test</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="col-lg-9">
+    <div class="mb-4">
+      <span class="badge text-bg-primary rounded-pill px-3 py-2">CRUD</span>
+      <h1 class="mt-3">Django CRUD Roadmap</h1>
+      <p class="lead">
+        This page shows a complete roadmap for building a simple Django CRUD app (Create, Read, Update, Delete)
+        using a <code>Person</code> model.
+      </p>
+    </div>
+
+    <div class="accordion" id="crudAccordion">
+
+      <!-- OVERVIEW -->
+      <div class="accordion-item" id="overview">
+        <h2 class="accordion-header" id="headingOverview">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOverview" aria-expanded="true" aria-controls="collapseOverview">
+            CRUD Overview – What are we building?
+          </button>
+        </h2>
+        <div id="collapseOverview" class="accordion-collapse collapse show" aria-labelledby="headingOverview" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <p>
+              CRUD stands for <strong>Create, Read, Update, Delete</strong>.  
+              In this mini project, we will:
+            </p>
+            <ul>
+              <li><strong>Create</strong> people (name, surname, email) using a form on the homepage.</li>
+              <li><strong>Read</strong> all people in a Bootstrap table on the <code>/data/</code> page.</li>
+              <li><strong>Update</strong> existing records using an edit form.</li>
+              <li><strong>Delete</strong> records from the database with a delete button.</li>
+            </ul>
+
+            <div class="alert alert-info mb-0">
+              <strong>Goal:</strong> Simple and clean CRUD example with Django models, views, templates and Bootstrap.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 0 -->
+      <div class="accordion-item" id="step0">
+        <h2 class="accordion-header" id="headingStep0">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep0" aria-expanded="false" aria-controls="collapseStep0">
+            0) Create project folder & virtual environment
+          </button>
+        </h2>
+        <div id="collapseStep0" class="accordion-collapse collapse" aria-labelledby="headingStep0" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <p>Terminal commands to set up the project and app:</p>
+
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-header">Terminal</div>
+              <div class="card-body">
+<pre class="mb-0"><code>0) Create empty file
+1) PS C:\Users\Alvin\Desktop\CRUD-roadmap&gt; mkdir core
+2) PS C:\Users\Alvin\Desktop\CRUD-roadmap&gt; cd .\core\
+3) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python -m venv .venv
+4) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; .venv\Scripts\activate
+5) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; pip install Django
+6) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; django-admin startproject core .
+7) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python manage.py startapp home
+8) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python manage.py runserver</code></pre>
+              </div>
+            </div>
+
+            <div class="alert alert-success mb-0">
+              <strong>Structure is ready ✅</strong> – You now have a Django project <code>core</code> and app <code>home</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="accordion-item" id="step1">
+        <h2 class="accordion-header" id="headingStep1">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep1" aria-expanded="false" aria-controls="collapseStep1">
+            Step 1: Add app to INSTALLED_APPS (core/core/settings.py)
+          </button>
+        </h2>
+        <div id="collapseStep1" class="accordion-collapse collapse" aria-labelledby="headingStep1" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <p>Open <code>core/core/settings.py</code> and add <code>home</code> into <code>INSTALLED_APPS</code>:</p>
+
+            <div class="card border-start border-4 border-primary">
+              <div class="card-header bg-white">
+                <strong>core/core/settings.py</strong>
+              </div>
+              <div class="card-body">
+{% verbatim %}
+<pre class="mb-0"><code>INSTALLED_APPS = [
+    ...
+    'home',
+]</code></pre>
+{% endverbatim %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="accordion-item" id="step2">
+        <h2 class="accordion-header" id="headingStep2">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep2" aria-expanded="false" aria-controls="collapseStep2">
+            Step 2: Migrate & create Person model
+          </button>
+        </h2>
+        <div id="collapseStep2" class="accordion-collapse collapse" aria-labelledby="headingStep2" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <h5>1) First migration</h5>
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-body">
+<pre class="mb-0"><code>1) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python manage.py migrate</code></pre>
+              </div>
+            </div>
+
+            <h5>2) Add <code>Person</code> model</h5>
+            <p>Open <code>core/home/models.py</code> and add:</p>
+
+{% verbatim %}
+<pre><code>from django.db import models
+
+class Person(models.Model):
+    name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"Name: {self.name}"</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">3) Make migrations & migrate</h5>
+            <div class="card bg-dark text-light">
+              <div class="card-body">
+<pre><code>2) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python manage.py makemigrations
+3) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python manage.py migrate</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="accordion-item" id="step3">
+        <h2 class="accordion-header" id="headingStep3">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep3" aria-expanded="false" aria-controls="collapseStep3">
+            Step 3: Admin & Superuser
+          </button>
+        </h2>
+        <div id="collapseStep3" class="accordion-collapse collapse" aria-labelledby="headingStep3" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <p>Register the <code>Person</code> model in <code>core/home/admin.py</code> (not shown here), then create a superuser:</p>
+
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-body">
+<pre><code>1) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python manage.py createsuperuser
+
+Username (leave blank to use 'alvin'): alvin
+Email address: elvinbabanli0@gmail.com
+Password: 12345678 (Password going to be invisible)
+Password (again): 12345678 (Password going to be invisible)
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="accordion-item" id="step4">
+        <h2 class="accordion-header" id="headingStep4">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep4" aria-expanded="false" aria-controls="collapseStep4">
+            Step 4: URLs (core/core/urls.py & home/urls.py)
+          </button>
+        </h2>
+        <div id="collapseStep4" class="accordion-collapse collapse" aria-labelledby="headingStep4" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <h5>1) core/core/urls.py</h5>
+            <p>Add imports and include <code>home.urls</code>:</p>
+
+{% verbatim %}
+<pre><code>from django.contrib import admin
+from django.urls import path, include
+from home.views import *
+
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('home.urls')),
+]</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">2) core/home/urls.py</h5>
+            <p>Create <code>home/urls.py</code> and add the CRUD routes:</p>
+
+{% verbatim %}
+<pre><code>from django.urls import path
+from .views import index, get_data, delete_data, update_data
+
+urlpatterns = [
+    path('', index, name='main'),
+    path('data/', get_data, name='get_data'),
+    path('delete/int:person_id/', delete_data, name='delete_data'),
+    path('update/int:person_id', update_data, name='update'),
+]</code></pre>
+{% endverbatim %}
+
+            <div class="alert alert-info mt-3 mb-0">
+              <strong>Note:</strong> These routes map directly to the view functions that implement Create, Read, Update and Delete.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="accordion-item" id="step5">
+        <h2 class="accordion-header" id="headingStep5">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep5" aria-expanded="false" aria-controls="collapseStep5">
+            Step 5: Templates & Static structure
+          </button>
+        </h2>
+        <div id="collapseStep5" class="accordion-collapse collapse" aria-labelledby="headingStep5" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <p>Create these HTML templates:</p>
+            <ul>
+              <li><code>core/home/templates/base.html</code></li>
+              <li><code>core/home/templates/index.html</code></li>
+              <li><code>core/home/templates/data.html</code></li>
+              <li><code>core/home/templates/update.html</code></li>
+            </ul>
+
+            <p>Also create a static folder:</p>
+            <ul>
+              <li><code>core/home/static/</code></li>
+              <li><code>styles.css</code> (optional extra styling)</li>
+            </ul>
+
+            <div class="alert alert-secondary mb-0">
+              You can use <a href="https://getbootstrap.com/" target="_blank">Bootstrap</a> examples for modern tables and forms.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="accordion-item" id="step6">
+        <h2 class="accordion-header" id="headingStep6">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep6" aria-expanded="false" aria-controls="collapseStep6">
+            Step 6: Views – full CRUD logic (home/views.py)
+          </button>
+        </h2>
+        <div id="collapseStep6" class="accordion-collapse collapse" aria-labelledby="headingStep6" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <p>Add the views to <code>core/home/views.py</code>:</p>
+
+{% verbatim %}
+<pre><code>from django.shortcuts import render, redirect, get_object_or_404
+from .models import Person
+
+def index(request):
+    edit_id = request.GET.get('edit')
+    if request.method == 'GET' and edit_id:
+        obj = get_object_or_404(Person, id=edit_id)
+        return render(request, 'index.html', {'person': obj, 'is_edit': True})
+
+    if request.method == 'POST':
+        person_id = request.POST.get('person_id')
+        name = request.POST.get('name')
+        surname = request.POST.get('surname')
+        email = request.POST.get('email')
+
+        if person_id:
+            obj = get_object_or_404(Person, id=person_id)
+            obj.name = name
+            obj.surname = surname
+            obj.email = email
+            obj.save()
+            return redirect('/data/')
+        else:
+            Person.objects.create(name=name, surname=surname, email=email)
+            return redirect('/')
+
+    return render(request, 'index.html')
+
+def get_data(request):
+    people = Person.objects.all()
+    return render(request, 'data.html', {'data': people})
+
+
+def update_data(request, person_id):
+    obj = get_object_or_404(Person, id=person_id)
+    if request.method == 'POST':
+        obj.name = request.POST.get('name')
+        obj.surname = request.POST.get('surname')
+        obj.email = request.POST.get('email')
+        obj.save()
+        return redirect('/data/')
+    return render(request, 'update.html', {'data': obj})
+
+
+def delete_data(request, person_id):
+    obj = get_object_or_404(Person, id=person_id)
+    obj.delete()
+    return redirect('/data/')</code></pre>
+{% endverbatim %}
+
+            <ul class="mt-3">
+              <li><strong>Create</strong> – POST without <code>person_id</code> in <code>index</code>.</li>
+              <li><strong>Read</strong> – <code>get_data</code> shows all people in a table.</li>
+              <li><strong>Update</strong> – either via <code>edit</code> query parameter in <code>index</code> or <code>update_data</code> view.</li>
+              <li><strong>Delete</strong> – <code>delete_data</code> removes a record and redirects back to the table.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="accordion-item" id="step7">
+        <h2 class="accordion-header" id="headingStep7">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep7" aria-expanded="false" aria-controls="collapseStep7">
+            Step 7: HTML templates (Bootstrap forms & table)
+          </button>
+        </h2>
+        <div id="collapseStep7" class="accordion-collapse collapse" aria-labelledby="headingStep7" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <h5>1) base.html</h5>
+{% verbatim %}
+<pre><code>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+    &lt;title&gt;{% block title %}{% endblock %}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body class="p-3"&gt;
+    &lt;nav class="mb-3 d-flex gap-2"&gt;
+        &lt;a class="btn btn-primary" href="/"&gt;Home&lt;/a&gt;
+        &lt;a class="btn btn-secondary" href="/data/"&gt;Data&lt;/a&gt;
+    &lt;/nav&gt;
+    {% block content %}{% endblock %}
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">2) index.html – Create & inline edit form</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+&lt;form method="post" class="card p-3 shadow-sm"&gt;
+    {% csrf_token %}
+    {% if is_edit %}
+        &lt;input type="hidden" name="person_id" value="{{ person.id }}"&gt;
+    {% endif %}
+    &lt;div class="mb-3"&gt;
+        &lt;input class="form-control" name="name" placeholder="Name"
+               value="{{ person.name|default:'' }}" required&gt;
+    &lt;/div&gt;
+    &lt;div class="mb-3"&gt;
+        &lt;input class="form-control" name="surname" placeholder="Surname"
+               value="{{ person.surname|default:'' }}" required&gt;
+    &lt;/div&gt;
+    &lt;div class="mb-3"&gt;
+        &lt;input class="form-control" name="email" type="email" placeholder="Email"
+               value="{{ person.email|default:'' }}" required&gt;
+    &lt;/div&gt;
+
+    &lt;div class="d-flex gap-2 mt-2"&gt;
+        &lt;button class="btn btn-primary" type="submit"&gt;
+            {% if is_edit %}Save Changes{% else %}Add User{% endif %}
+        &lt;/button&gt;
+
+        {% if is_edit %}
+            &lt;a class="btn btn-secondary" href="/"&gt;Cancel&lt;/a&gt;
+        {% endif %}
+    &lt;/div&gt;
+&lt;/form&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">3) data.html – Read & action buttons</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html' %}
+{% block title %}Data{% endblock %}
+{% block content %}
+&lt;table class="table table-striped align-middle"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;#&lt;/th&gt;
+            &lt;th&gt;Name&lt;/th&gt;
+            &lt;th&gt;Surname&lt;/th&gt;
+            &lt;th&gt;Email&lt;/th&gt;
+            &lt;th&gt;Actions&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        {% for p in data %}
+        &lt;tr&gt;
+            &lt;th scope="row"&gt;{{ forloop.counter }}&lt;/th&gt;
+            &lt;td&gt;{{ p.name }}&lt;/td&gt;
+            &lt;td&gt;{{ p.surname }}&lt;/td&gt;
+            &lt;td&gt;{{ p.email }}&lt;/td&gt;
+            &lt;td class="d-flex gap-2"&gt;
+                &lt;a href="/?edit={{ p.id }}" class="btn btn-sm btn-warning"&gt;Edit&lt;/a&gt;
+                &lt;a href="/delete/{{ p.id }}/" class="btn btn-sm btn-danger"&gt;Delete&lt;/a&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        {% endfor %}
+    &lt;/tbody&gt;
+&lt;/table&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">4) update.html – Separate update form</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html' %}
+{% block title %}Update{% endblock %}
+{% block content %}
+&lt;form method="post" class="card p-3 shadow-sm"&gt;
+    {% csrf_token %}
+    &lt;div class="mb-3"&gt;
+        &lt;input class="form-control" name="name" value="{{ data.name }}" required&gt;
+    &lt;/div&gt;
+    &lt;div class="mb-3"&gt;
+        &lt;input class="form-control" name="surname" value="{{ data.surname }}" required&gt;
+    &lt;/div&gt;
+    &lt;div class="mb-3"&gt;
+        &lt;input class="form-control" type="email" name="email" value="{{ data.email }}" required&gt;
+    &lt;/div&gt;
+    &lt;button class="btn btn-primary" type="submit"&gt;Save&lt;/button&gt;
+&lt;/form&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 8 -->
+      <div class="accordion-item" id="step8">
+        <h2 class="accordion-header" id="headingStep8">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep8" aria-expanded="false" aria-controls="collapseStep8">
+            Step 8: Run & test
+          </button>
+        </h2>
+        <div id="collapseStep8" class="accordion-collapse collapse" aria-labelledby="headingStep8" data-bs-parent="#crudAccordion">
+          <div class="accordion-body">
+            <p>Finally, run the development server:</p>
+
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-body">
+<pre class="mb-0"><code>1) PS C:\Users\Alvin\Desktop\CRUD-roadmap\core&gt; python manage.py runserver</code></pre>
+              </div>
+            </div>
+
+            <ul>
+              <li>Open the link shown in the terminal (e.g. <code>http://127.0.0.1:8000/</code>).</li>
+              <li>Test:
+                <ul>
+                  <li><code>/</code> – create or edit a person.</li>
+                  <li><code>/data/</code> – list, edit, delete records.</li>
+                </ul>
+              </li>
+            </ul>
+
+            <div class="alert alert-success mb-0">
+              Your Django CRUD app is ready – you can now extend it with search, pagination, filters and more.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /accordion -->
+
+  </div>
+</div>
+
+{% endblock %}

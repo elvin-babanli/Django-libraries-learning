@@ -21,5 +21,7 @@ from main.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name="Mainpage"),
-    path('django/',get_django, name="django")
+    path('django/',get_django, name="django"),
+    path('flask/',get_flask,name="flask"),
+    path('pandas/',get_pandas,name="pandas"),
 ]

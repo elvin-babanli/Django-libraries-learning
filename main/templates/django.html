@@ -1,8 +1,519 @@
 {% extends "base.html" %}
 
-{% block title %}Django{% endblock %}
+{% block title %}Django E-commerce{% endblock %}
 
 {% block content %}
-<h1>Django Page</h1>
-<p>This is Django section.</p>
+
+<div class="row">
+  <!-- LEFT SIDEBAR -->
+  <div class="col-lg-3 mb-4">
+    <div class="list-group shadow-sm sticky-top" style="top: 80px;">
+      <div class="list-group-item list-group-item-action active">
+        Django E-commerce Roadmap
+      </div>
+      <a href="#setup" class="list-group-item list-group-item-action">0) Project Setup</a>
+      <a href="#step1" class="list-group-item list-group-item-action">Step-1: settings.py</a>
+      <a href="#step2" class="list-group-item list-group-item-action">Step-2: Models & Migrations</a>
+      <a href="#step3" class="list-group-item list-group-item-action">Step-3: Superuser</a>
+      <a href="#step4" class="list-group-item list-group-item-action">Step-4: URLs</a>
+      <a href="#step5" class="list-group-item list-group-item-action">Step-5: Templates & Static</a>
+      <a href="#step6" class="list-group-item list-group-item-action">Step-6: Views</a>
+      <a href="#step7" class="list-group-item list-group-item-action">Step-7: Run & Test</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="col-lg-9">
+    <div class="mb-4">
+      <span class="badge text-bg-success rounded-pill px-3 py-2">Django E-commerce</span>
+      <h1 class="mt-3">Django E-commerce Tutorial</h1>
+      <p class="lead">
+        Aşağıdakı addımlar ilə sıfırdan sadə Django E-commerce sistemi qura biləcəksən.
+        Hamısı ardıcıllıqla yazılıb, terminal komandaları, modellər, view-lar və template-lər də buradadır.
+      </p>
+    </div>
+
+    <div class="accordion" id="djangoAccordion">
+
+      <!-- 0) PROJECT SETUP -->
+      <div class="accordion-item" id="setup">
+        <h2 class="accordion-header" id="headingSetup">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSetup" aria-expanded="true" aria-controls="collapseSetup">
+            0) Create empty file & basic project setup
+          </button>
+        </h2>
+        <div id="collapseSetup" class="accordion-collapse collapse show" aria-labelledby="headingSetup" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <p class="mb-3">
+              Əvvəlcə <strong>Django E-commerce</strong> üçün əsas strukturumuzu yaradırıq:
+            </p>
+
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-header">Terminal komandaları</div>
+              <div class="card-body">
+                <pre class="mb-0"><code>0) Create empty file
+1) Django E-commerce&gt; mkdir django
+2) Django E-commerce&gt; cd .\django\
+3) Django E-commerce\django&gt; python -m venv .venv
+4) Django E-commerce\django&gt; .venv\Scripts\activate
+5) Django E-commerce\django&gt; pip install Django
+6) Django E-commerce\django&gt; django-admin startproject myproject .
+7) Django E-commerce\django&gt; python manage.py startapp accounts
+8) Django E-commerce\django&gt; python manage.py runserver</code></pre>
+              </div>
+            </div>
+
+            <div class="alert alert-success mb-0">
+              <strong>Structure is ready ✅</strong> – Projekt və <code>accounts</code> app artıq hazırdır.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="accordion-item" id="step1">
+        <h2 class="accordion-header" id="headingStep1">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep1" aria-expanded="false" aria-controls="collapseStep1">
+            Step-1: myproject/myproject/settings.py – INSTALLED_APPS
+          </button>
+        </h2>
+        <div id="collapseStep1" class="accordion-collapse collapse" aria-labelledby="headingStep1" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <p>İlk olaraq <code>accounts</code> app-i <code>INSTALLED_APPS</code> hissəsinə əlavə edirik:</p>
+
+            <div class="card bg-light mb-2">
+              <div class="card-header">Fayl:</div>
+              <div class="card-body">
+                <code>myproject/myproject/settings.py</code>
+              </div>
+            </div>
+
+            <div class="card border-start border-4 border-success">
+              <div class="card-header bg-white">
+                <strong>add-INSTALLED_APPS:</strong>
+              </div>
+              <div class="card-body">
+{% verbatim %}
+<pre class="mb-0"><code>INSTALLED_APPS = [
+    ...
+    'accounts',
+]</code></pre>
+{% endverbatim %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="accordion-item" id="step2">
+        <h2 class="accordion-header" id="headingStep2">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep2" aria-expanded="false" aria-controls="collapseStep2">
+            Step-2: Migrations & Models
+          </button>
+        </h2>
+        <div id="collapseStep2" class="accordion-collapse collapse" aria-labelledby="headingStep2" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <h5>1) İlk migrate</h5>
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-header">Terminal</div>
+              <div class="card-body">
+                <pre class="mb-0"><code>1) Django E-commerce\django\myproject&gt; python manage.py migrate</code></pre>
+              </div>
+            </div>
+
+            <h5>2) Modelleri əlavə et</h5>
+            <p class="mb-2"><code>myproject/accounts/models.py</code> faylına aşağıdakı kodu yaz:</p>
+
+{% verbatim %}
+<pre><code>from django.db import models
+from django.contrib.auth.models import User
+
+
+class Customer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    Name = models.CharField(max_length=50)
+    Email = models.EmailField(unique=True) 
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=50)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class Order(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    product = models.ManyToManyField(Product)</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">3) Makemigrations & migrate</h5>
+            <div class="card bg-dark text-light">
+              <div class="card-body">
+                <pre class="mb-2"><code>2) Django E-commerce\django\myproject&gt; python manage.py makemigrations</code></pre>
+                <pre class="mb-0"><code>3) Django E-commerce\django\myproject&gt; python manage.py migrate</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="accordion-item" id="step3">
+        <h2 class="accordion-header" id="headingStep3">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep3" aria-expanded="false" aria-controls="collapseStep3">
+            Step-3: Superuser yaradılması
+          </button>
+        </h2>
+        <div id="collapseStep3" class="accordion-collapse collapse" aria-labelledby="headingStep3" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <p>Admin panelə giriş üçün superuser yaradırıq:</p>
+
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-body">
+                <pre class="mb-0"><code>myproject/accounts/admin.py  (sonradan modelləri register edəcəksən)
+
+1) Django E-commerce\django\myproject&gt; python manage.py createsuperuser
+
+Username (leave blank to use 'alvin'): alvin
+Email address: elvinbabanli0@gmail.com
+Password: 12345678 (Password going to be invisible)
+Password (again): 12345678 (Password going to be invisible)
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="accordion-item" id="step4">
+        <h2 class="accordion-header" id="headingStep4">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep4" aria-expanded="false" aria-controls="collapseStep4">
+            Step-4: myproject/myproject/urls.py
+          </button>
+        </h2>
+        <div id="collapseStep4" class="accordion-collapse collapse" aria-labelledby="headingStep4" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <p><code>accounts.views</code>-dən bütün view-ları import edib URL pattern-ləri yazırıq:</p>
+
+{% verbatim %}
+<pre><code>from accounts.views import *
+
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', index, name="homepage"),
+    path('signup/', signup_user, name="signup"),
+    path('login/', login_user, name="login"),
+    path('logout/', logout_user, name="logout"),
+    path('add-product/', add_product, name="add-product"),
+    path('product/', get_product, name="product"),
+    path('order/&lt;int:product_id&gt;', add_order, name="add-order"),
+    path('order/', get_order, name="order"),
+]</code></pre>
+{% endverbatim %}
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="accordion-item" id="step5">
+        <h2 class="accordion-header" id="headingStep5">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep5" aria-expanded="false" aria-controls="collapseStep5">
+            Step-5: Templates & Static files
+          </button>
+        </h2>
+        <div id="collapseStep5" class="accordion-collapse collapse" aria-labelledby="headingStep5" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <h5>Yaradılacaq template faylları</h5>
+            <ul>
+              <li><code>myproject/accounts/templates/add-product.html</code></li>
+              <li><code>myproject/accounts/templates/base.html</code></li>
+              <li><code>myproject/accounts/templates/index.html</code></li>
+              <li><code>myproject/accounts/templates/login.html</code></li>
+              <li><code>myproject/accounts/templates/order.html</code></li>
+              <li><code>myproject/accounts/templates/product.html</code></li>
+              <li><code>myproject/accounts/templates/signup.html</code></li>
+            </ul>
+
+            <p class="text-muted">Html examples: <a href="https://getbootstrap.com/" target="_blank">https://getbootstrap.com/</a></p>
+
+            <h5>Static folder</h5>
+            <ul>
+              <li><code>myproject/accounts/static/</code></li>
+              <li><code>styles.css</code></li>
+            </ul>
+
+            <hr>
+
+            <h5 class="mt-3">add-product.html</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html'%}
+
+{% block title %}
+Add Product
+{% endblock %}
+
+{% block content %}
+
+&lt;form method="post"&gt;
+    {% csrf_token %}
+    &lt;label for="name"&gt;Product Name&lt;/label&gt;
+    &lt;input type="text" name="name"&gt;
+    &lt;label for="name"&gt;Product Price&lt;/label&gt;
+    &lt;input type="text" name="price"&gt;
+    &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;a href="{% url 'logout' %}"&gt;Logout&lt;/a&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">base.html</h5>
+{% verbatim %}
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block title %} {% endblock %}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    {% block content %}
+    {% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">index.html</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html'%}
+
+{% block title %}
+Homepage
+{% endblock %}
+
+{% block content %}
+Homepage
+{% if user %}
+&lt;p&gt;Welcome {{user}}&lt;/p&gt;
+{% endif %}
+
+&lt;a href="{% url 'logout' %}"&gt;Logout&lt;/a&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">login.html</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html'%}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+&lt;form method="post"&gt;
+    {% csrf_token %}
+    &lt;label for="username"&gt;Username&lt;/label&gt;
+    &lt;input type="text" name="username"&gt;
+    &lt;label for="password"&gt;Password&lt;/label&gt;
+    &lt;input type="password" name="password"&gt;
+    &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">order.html</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html' %}
+
+{% block title %}
+Orders
+{% endblock %}
+
+{% block content %}
+{% for order in orders %}
+    &lt;p&gt;&lt;strong&gt;Order ID:&lt;/strong&gt; {{ order.id }}&lt;/p&gt;
+
+    {% for product in order.product.all %}
+        &lt;p&gt;
+            Product Name: {{ product.name }}&lt;br&gt;
+            Product Price: ${{ product.price }}
+        &lt;/p&gt;
+    {% empty %}
+        &lt;p&gt;No products in this order.&lt;/p&gt;
+    {% endfor %}
+
+    &lt;hr&gt;
+{% endfor %}
+{% endblock %}</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">product.html</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html'%}
+
+{% block title %}
+Product
+{% endblock %}
+
+{% block content %}
+{% for product in products %}
+&lt;ul&gt;
+    &lt;li&gt;{{product.name}}&lt;/li&gt;
+    &lt;li&gt;{{product.price}}&lt;/li&gt;
+    &lt;a href="{% url 'add-order' product.id%}"&gt;Order Now&lt;/a&gt;
+&lt;/ul&gt;
+{% endfor %}
+
+&lt;a href="{% url 'logout' %}"&gt;Logout&lt;/a&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+
+            <h5 class="mt-4">signup.html</h5>
+{% verbatim %}
+<pre><code>{% extends 'base.html'%}
+
+{% block title %}
+Sign Up
+{% endblock %}
+
+{% block content %}
+&lt;form method="post"&gt;
+    {% csrf_token %}
+    &lt;label for="username"&gt;Username&lt;/label&gt;
+    &lt;input type="text" name="username"&gt;
+    &lt;label for="password"&gt;Password&lt;/label&gt;
+    &lt;input type="password" name="password"&gt;
+    &lt;label for="email"&gt;Email&lt;/label&gt;
+    &lt;input type="text" name="email"&gt;
+    &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+{% endblock %}</code></pre>
+{% endverbatim %}
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="accordion-item" id="step6">
+        <h2 class="accordion-header" id="headingStep6">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep6" aria-expanded="false" aria-controls="collapseStep6">
+            Step-6: accounts/views.py
+          </button>
+        </h2>
+        <div id="collapseStep6" class="accordion-collapse collapse" aria-labelledby="headingStep6" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <p><code>accounts/views.py</code> faylına aşağıdakı kodu əlavə edirik:</p>
+
+{% verbatim %}
+<pre><code>from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from .models import Customer, Product, Order
+
+
+def signup_user(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        email  = request.POST.get("email")
+
+        user = User.objects.create_user(username=username, password=password)
+        user.save()
+        customer = Customer.objects.create(user=user, Name=username, Email=email)
+        customer.save()
+        return redirect("login")
+    return render(request, "signup.html")
+
+
+def login_user(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("/")
+    return render(request, "login.html")
+
+
+@login_required
+def index(request):
+    return render(request, "index.html", {'user': request.user})
+
+
+def logout_user(request):
+    logout(request)
+    return redirect("login")
+
+
+def add_product(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        price = request.POST.get("price")
+
+        product = Product.objects.create(name=name, price=price)
+        product.save()
+        return redirect("/")
+    return render(request, "add-product.html")
+
+
+def get_product(request):
+    products = Product.objects.all()
+    return render(request, "product.html", {'products': products})
+
+
+def add_order(request, product_id):
+    customer = Customer.objects.get(user=request.user)
+    product = Product.objects.get(id=product_id)
+    order = Order.objects.create(
+        customer=customer
+    )
+    order.product.add(product)
+    order.save()
+    return redirect("order")
+
+
+def get_order(request):
+    orders = Order.objects.filter(customer__user=request.user)
+    return render(request, "order.html", {"orders": orders})</code></pre>
+{% endverbatim %}
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="accordion-item" id="step7">
+        <h2 class="accordion-header" id="headingStep7">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStep7" aria-expanded="false" aria-controls="collapseStep7">
+            Step-7: Test server & DB
+          </button>
+        </h2>
+        <div id="collapseStep7" class="accordion-collapse collapse" aria-labelledby="headingStep7" data-bs-parent="#djangoAccordion">
+          <div class="accordion-body">
+            <p>Artıq hər şey hazırdır, serveri işə salıb test edə bilərsən:</p>
+
+            <div class="card bg-dark text-light mb-3">
+              <div class="card-body">
+                <pre class="mb-0"><code>1) Django E-commerce\django\myproject&gt; python manage.py runserver</code></pre>
+              </div>
+            </div>
+
+            <p class="mb-1">Database-i vizual görmək üçün:</p>
+            <div class="alert alert-info mb-0">
+              Open: <a href="https://sqliteviewer.app/" class="alert-link" target="_blank">https://sqliteviewer.app/</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /accordion -->
+
+  </div>
+</div>
+
 {% endblock %}

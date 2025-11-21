@@ -6,3 +6,9 @@ def index(request):
 
 def get_django(request):
     return render(request, "django.html")
+
+def get_flask(request):
+    return render(request, "flask.html")
+
+def get_pandas(request):
+    return render(request,"pandas.html")
