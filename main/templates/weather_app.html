@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Weather App — Elvin's CodeBase{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">🌤 Weather App</h1>
+        <p class="text-muted">Enter a city name and get live weather updates.</p>
+    </div>
+
+    <!-- Form -->
+    <div class="card shadow-sm mb-4" style="border-radius: 1rem;">
+        <div class="card-body">
+
+            <form method="get" class="row g-3">
+                <div class="col-md-8">
+                    <label class="form-label">City name</label>
+                    <input 
+                        type="text"
+                        name="city"
+                        class="form-control"
+                        placeholder="e.g. Baku, Warsaw, London"
+                        value="{{ city }}"
+                    >
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" type="submit">
+                        🔍 Check Weather
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Results -->
+    {% if result %}
+    <div class="card shadow-sm border-0 mb-3" style="border-radius: 1rem;">
+        <div class="card-body d-flex align-items-center">
+            <div class="me-3" style="font-size: 2.2rem;">🌍</div>
+            <div>
+                <h5 class="fw-semibold mb-1">Current Weather</h5>
+                <p class="mb-0">{{ result }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="alert alert-danger shadow-sm">{{ error }}</div>
+    {% endif %}
+
+    {% if not result and not error %}
+    <p class="text-muted text-center mt-4">
+        Type a city above and click <strong>Check Weather</strong>.
+    </p>
+    {% endif %}
+
+</div>
+
+{% endblock %}
