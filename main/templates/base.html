@@ -7,17 +7,73 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <title>{% block title %}Python site{% endblock %}</title>
+    <title>{% block title %}Elvin's CodeBase{% endblock %}</title>
+
+    {% block extra_head %}{% endblock %}
+
+    <style>
+      body {
+        /* Açıq, amma bir az kreativ fon */
+        background: linear-gradient(
+          180deg,
+          #f8fafc 0%,
+          #ffffff 40%,
+          #f8fafc 100%
+        );
+        min-height: 100vh;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        font-size: 1.1rem;
+      }
+
+      .navbar-brand span {
+        color: #2563eb; /* mavi accent */
+      }
+
+      .nav-link {
+        font-weight: 500;
+      }
+
+      .nav-link:hover,
+      .dropdown-item:hover {
+        color: #0d6efd;
+      }
+
+      .codebase-pill {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      main {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+      }
+
+      footer {
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+    </style>
   </head>
 
-  <body class="p-3 m-0 border-0">
-
+  <body class="m-0 border-0">
     <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Python</a>
+        <a class="navbar-brand" href="/">
+          <span>Elvin's</span> CodeBase
+        </a>
+
+        <span class="badge text-bg-light codebase-pill d-none d-md-inline">
+          Projects • Learnings • Tests
+        </span>
+
         <button
-          class="navbar-toggler"
+          class="navbar-toggler ms-2"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNavDropdown"
@@ -28,12 +84,15 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul class="navbar-nav">
+        <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarNavDropdown">
+          <ul class="navbar-nav ms-auto">
+
+            <!-- Home -->
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Main</a>
+              <a class="nav-link" aria-current="page" href="/">Home</a>
             </li>
 
+            <!-- Projects -->
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -41,44 +100,77 @@
                 role="button"
                 data-bs-toggle="dropdown"
               >
-                Python Frameworks
+                Projects
               </a>
-              <ul class="dropdown-menu">
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header">Main projects</h6></li>
+                <li><a class="dropdown-item" href="/projects/cheap-flight-finder/">Cheap_Flight_Finder</a></li>
+                <li><a class="dropdown-item" href="/projects/stock-market-app/">Stock Market App</a></li>
+                <li><a class="dropdown-item" href="/projects/summarizer-app/">Summarizer App</a></li>
+                <li><a class="dropdown-item" href="/projects/cashly/">Cashly</a></li>
+                <li><a class="dropdown-item" href="/projects/ai-exam-passer/">AI Exam Passer</a></li>
+              </ul>
+            </li>
+
+            <!-- Learnings -->
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                Learnings
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header">Core Python</h6></li>
+                <li><a class="dropdown-item" href="/python-basics/">Python basics</a></li>
+
+                <li><hr class="dropdown-divider" /></li>
+
+                <li><h6 class="dropdown-header">Web & Backend</h6></li>
                 <li><a class="dropdown-item" href="/django/">Django</a></li>
                 <li><a class="dropdown-item" href="/flask/">Flask</a></li>
-                <li><a class="dropdown-item" href="#">Pyramid</a></li>
-                <li><a class="dropdown-item" href="#">CherryPy</a></li>
+                <li><a class="dropdown-item" href="/auth-system/">Sign in / Log in system</a></li>
+
+                <li><hr class="dropdown-divider" /></li>
+
+                <li><h6 class="dropdown-header">Tools & Data</h6></li>
+                <li><a class="dropdown-item" href="/git/">Git</a></li>
+                <li><a class="dropdown-item" href="/crud/">CRUD (Database Operations)</a></li>
+                <li><a class="dropdown-item" href="/sql/">SQL</a></li>
               </ul>
             </li>
 
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                Python Libraries
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/pandas/">Pandas</a></li>
-                <li><a class="dropdown-item" href="#">Mathplotlib</a></li>
-                <li><a class="dropdown-item" href="#">NumPy</a></li>
-                <li><a class="dropdown-item" href="#">TensorFlow</a></li>
-                <li><a class="dropdown-item" href="#">PyTorch</a></li>
-                <li><a class="dropdown-item" href="#">Scikit-learn</a></li>
-              </ul>
+            <!-- Notes & Tasks -->
+            <li class="nav-item">
+              <a class="nav-link" href="/notes/">Notes & Tasks</a>
             </li>
 
+            <!-- About Me -->
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">About Me</a>
+            </li>
           </ul>
         </div>
       </div>
     </nav>
 
     <!-- PAGE CONTENT -->
-    <div class="container mt-4">
-      {% block content %}{% endblock %}
-    </div>
+    <main>
+      <div class="container">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <footer class="border-top py-3">
+      <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <span>© {{ now|date:"Y" }} Elvin Babanlı — Elvin's CodeBase</span>
+        <span class="mt-1 mt-md-0">
+          <span class="me-2">Made with Python & Django</span>
+        </span>
+      </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   </body>

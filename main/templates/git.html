@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+
+{% block title %}Git Guide — Elvin's CodeBase{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Sidebar */
+  .git-sidebar {
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #ffffff;
+  }
+
+  .git-sidebar .list-group-item.active {
+    background: linear-gradient(135deg, #0d6efd, #22c55e);
+    border-color: transparent;
+  }
+
+  .git-sidebar .list-group-item {
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+  }
+
+  /* Intro badge row */
+  .git-intro-pill {
+    display: inline-flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
+  .git-intro-pill span {
+    background: #e5f0ff;
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+  }
+
+  /* Code "window" (VS Code / PowerShell look) */
+  .code-window {
+    border-radius: 0.9rem;
+    overflow: hidden;
+    background: #020617;
+    color: #e5e7eb;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.45);
+  }
+
+  .code-window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.4rem 0.9rem;
+    background: linear-gradient(135deg, #111827, #0f172a);
+    font-size: 0.78rem;
+  }
+
+  .code-dots {
+    display: inline-flex;
+    gap: 0.3rem;
+  }
+
+  .code-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+  }
+
+  .code-dot.red { background: #f87171; }
+  .code-dot.yellow { background: #facc15; }
+  .code-dot.green { background: #4ade80; }
+
+  .code-window-title {
+    color: #9ca3af;
+  }
+
+  .code-window-path {
+    font-size: 0.7rem;
+    color: #6b7280;
+  }
+
+  .code-window-body {
+    padding: 0.75rem 1rem;
+  }
+
+  .code-window pre {
+    margin-bottom: 0;
+    background: transparent;
+    color: inherit;
+    border-radius: 0;
+    padding: 0;
+    white-space: pre;
+  }
+
+  .code-window code {
+    color: #e5e7eb;
+    font-size: 0.85rem;
+  }
+
+  /* Lighter window for config / .gitignore */
+  .code-window.light {
+    background: #0b1220;
+  }
+
+  /* Small label over sections */
+  .section-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+
+  .accordion-button:not(.collapsed) {
+    background-color: #eef2ff;
+    color: #111827;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+  <!-- SIDEBAR -->
+  <div class="col-lg-3 mb-4">
+    <div class="list-group shadow-sm sticky-top git-sidebar" style="top: 80px;">
+      <div class="list-group-item active fw-semibold">Git Tutorial</div>
+
+      <a href="#intro" class="list-group-item list-group-item-action">Introduction</a>
+      <a href="#first_init" class="list-group-item list-group-item-action">1) First-Time Setup</a>
+      <a href="#push_updates" class="list-group-item list-group-item-action">2) Pushing Updates</a>
+      <a href="#return_next_day" class="list-group-item list-group-item-action">3) Returning Next Day</a>
+      <a href="#gitignore" class="list-group-item list-group-item-action">4) .gitignore (Django)</a>
+      <a href="#project_examples" class="list-group-item list-group-item-action">5) Project Examples</a>
+      <a href="#remove_git" class="list-group-item list-group-item-action">6) Remove Git Tracking</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="col-lg-9">
+
+    <!-- Intro -->
+    <div class="mb-4" id="intro">
+      <span class="badge text-bg-dark px-3 py-2">GIT</span>
+      <h1 class="mt-3 mb-2">Git & GitHub — Student-Friendly Guide</h1>
+      <p class="lead mb-2">
+        This page collects all your Git notes in one place: from initializing a repository
+        to pushing real projects like Cheap_Flight_Finder and Django Store.
+      </p>
+
+      <div class="git-intro-pill mb-3">
+        <span>git init → first commit</span>
+        <span>git push / git pull</span>
+        <span>.gitignore for Django</span>
+        <span>real project workflows</span>
+      </div>
+
+      <div class="alert alert-info border-0 shadow-sm">
+        <strong>Tip:</strong> Think of Git as a “time machine” for your code – it saves snapshots
+        (commits) so you can track progress and share projects easily.
+      </div>
+    </div>
+
+
+    <div class="accordion" id="gitAccordion">
+
+      <!-- 1) FIRST TIME SETUP -->
+      <div class="accordion-item" id="first_init">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+            1) First-Time Project Setup
+          </button>
+        </h2>
+
+        <div id="collapseOne" class="accordion-collapse collapse show">
+          <div class="accordion-body">
+            <p class="section-label mb-1">Overview</p>
+            <p>When you start a Git-enabled project for the very first time, you need to:</p>
+            <ul>
+              <li>Initialize Git in your project folder</li>
+              <li>Track files</li>
+              <li>Make the first commit</li>
+              <li>Connect to GitHub and push</li>
+            </ul>
+
+            <div class="code-window terminal-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">PowerShell — First Git Setup</span>
+                </div>
+                <span class="code-window-path">C:\Your\Project\Folder&gt;</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>git init
+git status
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/your-username/your-repo.git
+git branch -M main
+git push -u origin main</code></pre>
+              </div>
+            </div>
+
+            <p class="mb-0">
+              This prepares your local folder and uploads it to your GitHub repository for the first time.
+            </p>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- 2) PUSH UPDATES -->
+      <div class="accordion-item" id="push_updates">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+            2) How to Push Updates Every Time
+          </button>
+        </h2>
+
+        <div id="collapseTwo" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <p class="section-label mb-1">Daily workflow</p>
+            <p>Whenever you make changes to your project, use this short routine:</p>
+
+            <ol>
+              <li><strong>Check what changed</strong> — <code>git status</code></li>
+              <li><strong>Stage changes</strong> — <code>git add .</code></li>
+              <li><strong>Commit with a clear message</strong></li>
+              <li><strong>Push to GitHub</strong></li>
+            </ol>
+
+            <div class="code-window terminal-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">PowerShell — Daily Git Routine</span>
+                </div>
+                <span class="code-window-path">C:\Your\Project\Folder&gt;</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>git status
+git add .
+git commit -m "Short description of changes"
+git push</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- 3) RETURN NEXT DAY -->
+      <div class="accordion-item" id="return_next_day">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+            3) Returning to Project on Another Day
+          </button>
+        </h2>
+
+        <div id="collapseThree" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <p class="section-label mb-1">Morning routine</p>
+            <p>When you come back to a project another day, always:</p>
+            <ul>
+              <li>Go to the project folder</li>
+              <li>Activate virtual environment (if you use one)</li>
+              <li><strong>Pull from GitHub first</strong> (very important)</li>
+              <li>Then continue with coding and normal Git steps</li>
+            </ul>
+
+            <div class="code-window terminal-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">PowerShell — New Day Workflow</span>
+                </div>
+                <span class="code-window-path">C:\Your\Project\Folder&gt;</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>cd project-folder
+venv\Scripts\activate        # if needed
+git pull origin main
+git status
+git add .
+git commit -m "Today's updates"
+git push</code></pre>
+              </div>
+            </div>
+
+            <p class="mb-0">
+              <strong>Rule:</strong> always <code>git pull</code> before starting new work, especially if you use the same repo on multiple computers.
+            </p>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- 4) GITIGNORE -->
+      <div class="accordion-item" id="gitignore">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+            4) Recommended .gitignore for Django
+          </button>
+        </h2>
+
+        <div id="collapseFour" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <p class="section-label mb-1">Why .gitignore?</p>
+            <p>
+              Some files should never go to GitHub: virtual environments, cache files, local databases,
+              secrets and editor config. For a Django project, a simple <code>.gitignore</code> can look like this:
+            </p>
+
+            <div class="code-window light mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">VS Code — .gitignore (Django)</span>
+                </div>
+                <span class="code-window-path">.gitignore</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+.vscode/
+.env
+*.env
+.DS_Store
+Thumbs.db</code></pre>
+              </div>
+            </div>
+
+            <p class="mb-0">
+              This keeps your repository clean and protects sensitive data like environment variables.
+            </p>
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- 5) PROJECT EXAMPLES -->
+      <div class="accordion-item" id="project_examples">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+            5) Real Project Examples (Your Own Projects)
+          </button>
+        </h2>
+
+        <div id="collapseFive" class="accordion-collapse collapse">
+          <div class="accordion-body">
+
+            <!-- Example 1 -->
+            <h4 class="mt-2">📌 Example 1 – Python Homework Push (SyntaxError folder)</h4>
+            <p class="text-muted mb-2">Single file homework pushed to GitHub.</p>
+            <div class="code-window terminal-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">PowerShell — Homework Repo</span>
+                </div>
+                <span class="code-window-path">C:\Users\Alvin\Desktop\İt_step\Homeworks\SyntaxError&gt;</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>cd "C:\Users\Alvin\Desktop\İt_step\Homeworks\SyntaxError"
+git init
+git add module_branching_statements_part_1.py
+git commit -m "day_3"
+git push -u origin main</code></pre>
+              </div>
+            </div>
+
+            <!-- Example 2 -->
+            <h4 class="mt-4">📌 Example 2 – Django Store Project</h4>
+            <p class="text-muted mb-2">Full Django project pushed to a GitHub repo.</p>
+            <div class="code-window terminal-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">PowerShell — Django Store</span>
+                </div>
+                <span class="code-window-path">C:\Users\Alvin\Desktop\django_web\core&gt;</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>cd C:\Users\Alvin\Desktop\django_web\core
+git init
+git add .
+git commit -m "Initial Django store project"
+git remote add origin https://github.com/elvin-babanli/Django-store.git
+git branch -M main
+git push -u origin main</code></pre>
+              </div>
+            </div>
+
+            <!-- Example 3 -->
+            <h4 class="mt-4">📌 Example 3 – Cheap Flight Finder (with .env in .gitignore)</h4>
+            <p class="text-muted mb-2">Python app with API keys safely ignored using <code>.env</code>.</p>
+            <div class="code-window terminal-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">PowerShell — Cheap_Flight_Finder</span>
+                </div>
+                <span class="code-window-path">C:\Users\Alvin\Desktop\İt_step\apps\Cheap_Flight_Finder&gt;</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>cd "C:\Users\Alvin\Desktop\İt_step\apps\Cheap_Flight_Finder"
+git init
+echo .env > .gitignore
+
+# add safe ignores
+.env
+__pycache__/
+.vscode/
+*.pyc
+
+git add app.py .gitignore
+git commit -m "Added app.py and .gitignore"
+git remote add origin https://github.com/elvin-babanli/Cheap_Flight_Finder.git
+git branch -M main
+git push -u origin main</code></pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- 6) REMOVE GIT -->
+      <div class="accordion-item" id="remove_git">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSix">
+            6) Optional: Remove Git Tracking Completely
+          </button>
+        </h2>
+
+        <div id="collapseSix" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <p class="section-label mb-1">Danger zone</p>
+            <p>
+              Sometimes you might want to completely remove Git tracking from a folder
+              (for example, to re-init or if you accidentally initialized in the wrong place).
+            </p>
+
+            <div class="alert alert-danger">
+              ⚠ <strong>Warning:</strong> This deletes the entire <code>.git</code> folder.
+              All commit history will be lost in this local repo.
+            </div>
+
+            <div class="code-window terminal-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="code-dots">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                  </div>
+                  <span class="code-window-title">PowerShell — Remove Git</span>
+                </div>
+                <span class="code-window-path">C:\Your\Project\Folder&gt;</span>
+              </div>
+              <div class="code-window-body">
+<pre><code>Remove-Item -Recurse -Force .git</code></pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- END ACCORDION -->
+
+  </div>
+</div>
+
+{% endblock %}

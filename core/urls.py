@@ -24,4 +24,6 @@ urlpatterns = [
     path('django/',get_django, name="django"),
     path('flask/',get_flask,name="flask"),
     path('pandas/',get_pandas,name="pandas"),
+    path('git/',get_git,name="git"),
+    path('crud/',get_crud,name="crud"),
 ]
