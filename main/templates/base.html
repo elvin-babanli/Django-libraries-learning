@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,50 +13,126 @@
     {% block extra_head %}{% endblock %}
 
     <style>
+      /* ====== Global Look & Feel ====== */
       body {
-        /* Açıq, amma bir az kreativ fon */
-        background: linear-gradient(
-          180deg,
-          #f8fafc 0%,
-          #ffffff 40%,
-          #f8fafc 100%
-        );
+        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%, #f8fafc 100%);
         min-height: 100vh;
       }
+      .navbar-brand { font-weight: 700; letter-spacing: 0.03em; font-size: 1.1rem; }
+      .navbar-brand span { color: #2563eb; }
+      .nav-link { font-weight: 500; }
+      .nav-link:hover, .dropdown-item:hover { color: #0d6efd; }
+      .codebase-pill { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+      main { padding-top: 1.5rem; padding-bottom: 2rem; }
+      footer { font-size: 0.8rem; color: #6b7280; }
 
-      .navbar-brand {
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        font-size: 1.1rem;
+      /* ====== Chat: site-aligned minimal style ====== */
+      :root{
+        --cbg:#ffffff;
+        --cbd:#f3f4f6;
+        --cbdark:#111827;
+        --cgray:#6b7280;
+        --cprimary:#2563eb;
+        --cprimary-weak:#e8f0fe;
+        --border:rgba(17,24,39,.08);
+        --shadow:0 12px 30px rgba(0,0,0,.10);
       }
 
-      .navbar-brand span {
-        color: #2563eb; /* mavi accent */
+      .chat-launcher{
+        position:fixed; right:18px; bottom:18px; z-index:1055;
+        display:flex; align-items:center; gap:8px;
+        background:var(--cbg); color:var(--cbdark);
+        border:1px solid var(--border);
+        border-radius:999px; padding:10px 14px;
+        box-shadow:var(--shadow); cursor:pointer;
+        transform:translateY(16px); opacity:0; transition:all .28s ease;
+      }
+      .chat-launcher.show{ transform:translateY(0); opacity:1; }
+      .chat-launcher .dot{
+        width:8px; height:8px; border-radius:50%; background:var(--cprimary);
+        box-shadow:0 0 0 3px var(--cprimary-weak);
+      }
+      .chat-launcher .text{ font-size:.94rem; }
+
+      .chat-panel{
+        position:fixed; right:18px; bottom:18px; z-index:1056;
+        width:360px; max-width:calc(100vw - 36px); height:580px;
+        background:var(--cbg);
+        border-radius:16px;
+        overflow:hidden;
+    
+    
+    border:none;
+
+    
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.35),
+        0 15px 40px rgba(0,0,0,.25);
+
+    display:none;
+}
+      .chat-panel.open{ display:flex; flex-direction:column; }
+
+      .chat-header{
+        display:flex; align-items:center; justify-content:space-between;
+        padding:10px 12px; border-bottom:1px solid var(--border);
+        background:linear-gradient(180deg,#fafafa,#fff);
+      }
+      .chat-header .left{ display:flex; align-items:center; gap:10px; }
+      .chat-header .avatar{
+      width:28px; height:28px; border-radius:50%;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
+      background-image: url("{% static 'img/elvin-profile.png' %}");
+      border: 1px solid rgba(17,24,39,.12);
+      }
+      .chat-header .title{ font-weight:600; font-size:.95rem; color:var(--cbdark); }
+      .chat-header .sub{ font-size:.78rem; color:var(--cgray); }
+      .chat-header .icon-btn{
+        width:34px; height:34px; display:grid; place-items:center;
+        border-radius:10px; background:#f8fafc; border:1px solid var(--border);
+        color:#111827; cursor:pointer;
+      }
+      .chat-header .icon-btn:hover{ background:#eef2ff; color:var(--cprimary); }
+
+      .chat-body{
+        flex:1; overflow:auto; padding:12px 10px 8px 10px; background:#fff;
+        scrollbar-width:thin; scrollbar-color:#e5e7eb transparent;
+      }
+      .chat-body::-webkit-scrollbar{ width:8px; }
+      .chat-body::-webkit-scrollbar-thumb{ background:#e5e7eb; border-radius:8px; }
+
+      .bubble{
+        max-width:80%; padding:10px 12px; border-radius:14px;
+        margin:6px 0; font-size:.95rem; line-height:1.35; word-break:break-word;
+        border:1px solid var(--border);
+      }
+      .bubble.bot{ background:#f9fafb; color:#111827; border-top-left-radius:6px; }
+      .bubble.user{
+        margin-left:auto; color:#0b1220; background:#eff6ff;
+        border:1px solid #dbeafe; border-top-right-radius:6px;
       }
 
-      .nav-link {
-        font-weight: 500;
+      .typing{ display:inline-flex; gap:4px; align-items:center; }
+      .typing .t-dot{
+        width:6px; height:6px; border-radius:50%; background:#9ca3af; opacity:.6;
+        animation:blink 1.1s infinite ease-in-out;
       }
+      .typing .t-dot:nth-child(2){ animation-delay:.18s }
+      .typing .t-dot:nth-child(3){ animation-delay:.36s }
+      @keyframes blink{ 0%,80%,100%{opacity:.2} 40%{opacity:1} }
 
-      .nav-link:hover,
-      .dropdown-item:hover {
-        color: #0d6efd;
+      .chat-input{
+        display:flex; gap:8px; align-items:center; padding:10px;
+        border-top:1px solid var(--border); background:#fff;
       }
-
-      .codebase-pill {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
+      .chat-input .box{
+        flex:1; background:#fff; border:1px solid var(--border);
+        border-radius:12px; padding:10px 12px; color:#111827; outline:none;
       }
-
-      main {
-        padding-top: 1.5rem;
-        padding-bottom: 2rem;
-      }
-
-      footer {
-        font-size: 0.8rem;
-        color: #6b7280;
+      .chat-input .box::placeholder{ color:#9ca3af; }
+      .chat-input .send-btn{
+        background:var(--cprimary); color:#fff; border:none; border-radius:12px;
+        padding:10px 14px; font-weight:600; cursor:pointer;
       }
     </style>
   </head>
@@ -77,31 +154,16 @@
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNavDropdown"
-          aria-controls="navbarNavDropdown"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarNavDropdown">
           <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
 
-            <!-- Home -->
-            <li class="nav-item">
-              <a class="nav-link" aria-current="page" href="/">Home</a>
-            </li>
-
-            <!-- Projects -->
             <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                Projects
-              </a>
+              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Projects</a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><h6 class="dropdown-header">Main projects</h6></li>
                 <li><a class="dropdown-item" href="/cheap-flight-finder/">Cheap Flight Finder</a></li>
@@ -112,16 +174,8 @@
               </ul>
             </li>
 
-            <!-- Learnings -->
             <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                Learnings
-              </a>
+              <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Learnings</a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><h6 class="dropdown-header">Core Python</h6></li>
                 <li><a class="dropdown-item" href="/python-basics/">Python basics</a></li>
@@ -143,19 +197,11 @@
                 <li><hr class="dropdown-divider" /></li>
                 <li><h6 class="dropdown-header">Python Libraries</h6></li>
                 <li><a class="dropdown-item" href="/pandas/">Pandas</a></li>
-
               </ul>
             </li>
 
-            <!-- Notes & Tasks -->
-            <li class="nav-item">
-              <a class="nav-link" href="/4o4-page/">Notes & Tasks</a>
-            </li>
-
-            <!-- About Me -->
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">About Me</a>
-            </li>
+            <li class="nav-item"><a class="nav-link" href="/4o4-page/">Notes & Tasks</a></li>
+            <li class="nav-item"><a class="nav-link" href="/about/">About Me</a></li>
           </ul>
         </div>
       </div>
@@ -170,13 +216,164 @@
 
     <footer class="border-top py-3">
       <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-        <span>© {{ now|date:"Y" }} Elvin Babanlı — Elvin's CodeBase</span>
+        <span>© {% now "Y" %} Elvin Babanlı — Elvin's CodeBase</span>
         <span class="mt-1 mt-md-0">
           <span class="me-2">Made with Python & Django</span>
         </span>
       </div>
     </footer>
 
+    <!-- Chat teaser -->
+    <div class="chat-launcher" id="chatLauncher" data-delay="2400" data-api="{{ CHAT_API_URL }}">
+      <span class="dot"></span>
+      <span class="text">Got a question? I’m here to help.</span>
+    </div>
+
+    <!-- Chat panel -->
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-header">
+        <div class="left">
+          <div class="avatar"></div>
+          <div>
+            <div class="title">Elvin Babanlı</div>
+            <div class="sub">online • quick replies</div>
+          </div>
+        </div>
+        <div class="d-flex gap-2">
+          <div class="icon-btn" id="minimizeBtn">—</div>
+          <div class="icon-btn" id="closeBtn">×</div>
+        </div>
+      </div>
+
+      <div class="chat-body" id="chatBody">
+        <div class="bubble bot">
+          Hi! I’m Elvin. Ask me anything about projects, stack, or your tasks.
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <textarea id="chatInput" class="box" rows="1" placeholder="Type your message…"></textarea>
+        <button class="send-btn" id="sendBtn">Send</button>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chat logic -->
+    <script>
+      (function(){
+        const launcher = document.getElementById('chatLauncher');
+        const panel    = document.getElementById('chatPanel');
+        const bodyEl   = document.getElementById('chatBody');
+        const inputEl  = document.getElementById('chatInput');
+        const sendBtn  = document.getElementById('sendBtn');
+        const minimize = document.getElementById('minimizeBtn');
+        const closeBtn = document.getElementById('closeBtn');
+
+        const apiURL = launcher?.dataset.api || "http://127.0.0.1:8001/chat";
+        const delay  = parseInt(launcher?.dataset.delay || "2400", 10);
+
+        let history = [];
+        try {
+          const saved = sessionStorage.getItem("ecb_chat_hist");
+          if (saved) history = JSON.parse(saved);
+        } catch(e){}
+
+        function persist() {
+          try { sessionStorage.setItem("ecb_chat_hist", JSON.stringify(history.slice(-12))); }
+          catch(e){}
+        }
+
+        function showLauncher(){ launcher?.classList.add("show"); }
+        function hideLauncher(){ launcher?.classList.remove("show"); }
+
+        function renderHistory(){
+          if (!history.length) return;
+          bodyEl.innerHTML = "";
+          history.forEach(msg =>
+            addBubble(msg.content, msg.role === "assistant" ? "bot" : "user")
+          );
+        }
+
+        function openPanel(){
+          panel.classList.add("open");
+          hideLauncher();
+          renderHistory();
+          inputEl.focus();
+        }
+        function closePanel(){
+          panel.classList.remove("open");
+          showLauncher();
+        }
+
+        function addBubble(text, who="bot"){
+          const div = document.createElement("div");
+          div.className = `bubble ${who}`;
+          div.textContent = text;
+          bodyEl.appendChild(div);
+          bodyEl.scrollTop = bodyEl.scrollHeight;
+        }
+
+        function addTyping(){
+          const wrap = document.createElement("div");
+          wrap.className = "bubble bot";
+          wrap.innerHTML = `<span class="typing">
+            <span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span>
+          </span>`;
+          bodyEl.appendChild(wrap);
+          bodyEl.scrollTop = bodyEl.scrollHeight;
+          return wrap;
+        }
+
+        async function sendMessage(){
+          const text = inputEl.value.trim();
+          if (!text || !apiURL) return;
+          inputEl.value = "";
+
+          addBubble(text, "user");
+          history.push({role:"user", content:text});
+          persist();
+
+          const typing = addTyping();
+
+          try{
+            const payload = { message:text, history:history };
+            const resp = await fetch(apiURL, {
+              method:"POST",
+              headers:{ "Content-Type":"application/json" },
+              body:JSON.stringify(payload)
+            });
+            if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+
+            typing.remove();
+            addBubble(data.reply || "Okay.", "bot");
+            history.push({role:"assistant", content:data.reply || ""});
+            persist();
+
+          } catch(err){
+            typing.remove();
+            addBubble("Sorry, I couldn’t reply right now.", "bot");
+          }
+        }
+
+        setTimeout(() => { showLauncher(); }, isNaN(delay) ? 2400 : delay);
+
+        launcher?.addEventListener("click", openPanel);
+        minimize?.addEventListener("click", closePanel);
+        closeBtn?.addEventListener("click", closePanel);
+        sendBtn?.addEventListener("click", sendMessage);
+
+        inputEl?.addEventListener("keydown", e => {
+          if (e.key === "Enter" && !e.shiftKey){
+            e.preventDefault();
+            sendMessage();
+          }
+          if (e.key === "Escape"){
+            closePanel();
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

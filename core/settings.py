@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'main.context_processors.chat_settings',
             ],
         },
     },
@@ -124,3 +125,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 OPENWEATHER_API_KEY = config("OPENWEATHER_API_KEY", default="")
+
+CHAT_API_URL = "http://127.0.0.1:8001/chat"
