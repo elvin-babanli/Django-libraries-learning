@@ -1,370 +1,742 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Home — Minimal</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+{% extends "base.html" %}
+{% load static %}
 
-  <style>
-    :root{
-      --bg:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --card:#f8fafc;
-      --border:#e5e7eb;
-      --shadow:0 10px 30px rgba(15,23,42,.08);
-      --radius:16px;
-      --radius-sm:12px;
-      --acc:#0d6efd;
-      --acc-2:#22c55e;
-    }
+{% block title %}Neon Metro — Tech News Deck{% endblock %}
+{% block content %}
 
-    /* Global reset */
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;background:var(--bg);color:var(--text);
-      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
-    }
-    img{max-width:100%;display:block}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f7f9fc;
+    --ink:#0d0d0f; --muted:#6b6b73;
+    --ring:#e9e9ee; --card:#ffffff;
+    --neon:#6C5CE7; --neon2:#00D1FF; --accent:#ff3d68;
 
-    .page{max-width:1200px;margin:0 auto;padding:16px 16px 80px}
+    /* Mac/Code block */
+    --code-bg:#0b0f19; --code-top:#0a0e17; --code-border:rgba(148,163,184,.12);
+    --green:#22c55e; --radius:16px; --shadow:0 16px 40px rgba(2,6,23,.14);
+    --fade-dur:.55s;
+  }
 
-    .section{margin-top:28px}
-    .title{
-      font-weight:700;letter-spacing:.2px;margin:0 0 12px;font-size:clamp(20px,2vw,24px)
-    }
-    .muted{color:var(--muted)}
+  /* ===== Global resets & layout ===== */
+  html,body{ height:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink); overflow-x:hidden; }
+  .wrap{ max-width:1200px; margin:28px auto 64px; padding:0 20px; }
 
-    /* ------------------------------
-       I) VIDEO SLIDER
-       ------------------------------ */
-    .slider{
-      position:relative;width:100%;
-      aspect-ratio: 16 / 9;
-      border-radius: var(--radius);
-      overflow:hidden;
-      background:#000;
-      box-shadow: var(--shadow);
-      user-select:none;
-    }
-    .slide{
-      position:absolute;inset:0;display:none;
-    }
-    .slide.active{ display:block; }
-    .slide iframe{
-      width:100%;height:100%;border:0;display:block;
-    }
-    .nav-btn{
-      position:absolute;top:50%;translate:0 -50%;
-      width:42px;height:42px;border-radius:999px;border:1px solid rgba(255,255,255,.35);
-      display:grid;place-items:center;color:#fff;background:rgba(15,23,42,.18);
-      backdrop-filter: blur(4px); cursor:pointer; opacity:.35;transition:.25s;
-    }
-    .nav-btn:hover{opacity:.9}
-    .nav-left{left:10px}
-    .nav-right{right:10px}
-    .nav-btn svg{width:20px;height:20px}
+  /* ========= HERO #1 (INTRO) — FULL-BLEED, DARKER, ANIMATED ========= */
+  .intro-hero-outer{
+    width:100vw;
+    margin-left:calc(50% - 50vw);
+    margin-right:calc(50% - 50vw);
+    margin-top:0;     /* flush with navbar */
+    margin-bottom:24px;
+  }
+  .intro-hero{
+    position:relative;
+    display:grid;
+    grid-template-columns: 140px 1fr 140px;  /* left spacer • main copy • right logo */
+    gap:22px; align-items:center;
+    padding:28px 28px;
+    border-top:1px solid rgba(148,163,184,.18);
+    border-bottom:1px solid rgba(148,163,184,.18);
+    overflow:hidden;
 
-    .dots{
-      position:absolute;left:0;right:0;bottom:10px;display:flex;gap:6px;justify-content:center
-    }
-    .dot{
-      width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.35);
-      transition:.25s
-    }
-    .dot.active{background:#fff}
+    /* dark layered background */
+    background:
+      radial-gradient(900px 500px at 90% 10%, rgba(108,92,231,.18) 0%, transparent 55%),
+      radial-gradient(1100px 600px at 10% -10%, rgba(0,209,255,.14) 0%, transparent 60%),
+      linear-gradient(180deg, #0b1020 0%, #0a0f1d 100%);
+    color:#eaf2ff;
+  }
+  .intro-spacer { width:100%; height:100%; }
 
-    /* ------------------------------
-       II) Websites I Use — Mac window
-       ------------------------------ */
-    .mac-window{
-      border-radius: var(--radius);
-      overflow:hidden;
-      box-shadow: var(--shadow);
-      background:#0b0f19;
-      color:#e2e8f0;
-    }
-    .mac-top{
-      display:flex;align-items:center;gap:8px;padding:10px 12px;background:#0a0e17;
-      border-bottom:1px solid rgba(148,163,184,.12)
-    }
-    .dot-r,.dot-y,.dot-g{
-      width:12px;height:12px;border-radius:50%
-    }
-    .dot-r{background:#ef4444}.dot-y{background:#eab308}.dot-g{background:#22c55e}
-    .sites{padding:14px}
-    .sites-grid{
-      display:grid;gap:12px;
-      grid-template-columns:repeat(6,1fr);
-    }
-    @media (max-width:1024px){
-      .sites-grid{grid-template-columns:repeat(4,1fr)}
-    }
-    @media (max-width:768px){
-      .sites-grid{grid-template-columns:repeat(3,1fr)}
-    }
-    @media (max-width:520px){
-      .sites-grid{grid-template-columns:repeat(2,1fr)}
-    }
-    .site-card{
-      display:block;padding:14px;border-radius:12px;
-      background:#0f172a;border:1px solid rgba(148,163,184,.12);
-      color:#e2e8f0;text-decoration:none;transition:.2s;
-    }
-    .site-card:hover{transform: translateY(-2px); box-shadow: 0 8px 22px rgba(2,6,23,.35)}
-    .site-card small{color:#94a3b8;display:block;margin-top:4px;font-size:.8rem;word-break:break-all}
+  /* animated soft grid */
+  .intro-hero::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(0deg, rgba(255,255,255,.045) 1px, transparent 1px) 0 0/ 100% 28px,
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0/ 28px 100%;
+    opacity:.6; pointer-events:none; animation:gridFloat 16s linear infinite;
+  }
+  @keyframes gridFloat { to { transform: translateY(-28px) } }
 
-    /* ------------------------------
-       III) Projects — cards
-       ------------------------------ */
-    .projects-grid{
-      display:grid;gap:16px;grid-template-columns: repeat(3,1fr);
-    }
-    @media (max-width:992px){
-      .projects-grid{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:600px){
-      .projects-grid{grid-template-columns:1fr}
-    }
-    .card{
-      background:var(--card);border:1px solid var(--border);
-      border-radius:var(--radius-sm); padding:18px;
-      box-shadow: var(--shadow); transition:.2s
-    }
-    .card:hover{ transform: translateY(-3px)}
-    .card h3{margin:0 0 6px;font-size:1.05rem}
-    .links{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .link{font-weight:600;text-decoration:none;color:var(--acc);border-bottom:1px dashed transparent}
-    .link:hover{border-bottom-color:var(--acc)}
+  .intro-main{ position:relative; z-index:1; }
+  .intro-kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font:600 12px/1 Inter; letter-spacing:.5px; text-transform:uppercase; color:#93c5fd;
+    background:rgba(14,23,46,.6); border:1px solid rgba(147,197,253,.28);
+    padding:8px 10px; border-radius:999px;
+    animation:fadeUp .5s .05s both;
+  }
+  .intro-title{
+    font:800 clamp(32px,4.8vw,56px)/1.05 Inter, system-ui; margin:12px 0 8px;
+    letter-spacing:.2px; animation:fadeUp .55s .1s both; color:#f3f7ff;
+  }
+  .intro-sub{
+    color:#cfe3ff; max-width:84ch; font-size:15px; line-height:1.7;
+    animation:fadeUp .55s .15s both;
+  }
+  .intro-bubble{
+    display:inline-flex; align-items:center; gap:8px;
+    margin-top:14px; background:#0f172a; color:#e5edff;
+    border:1px solid rgba(148,163,184,.28); padding:10px 12px; border-radius:12px;
+    box-shadow:0 8px 22px rgba(0,0,0,.25);
+    animation:fadeUp .55s .2s both;
+  }
+  .intro-bubble svg{ width:16px; height:16px }
+  @keyframes fadeUp { from{ opacity:0; transform: translateY(8px) } to{ opacity:1; transform:none } }
 
-    /* ------------------------------
-       IV) News — cards with thumbnail
-       ------------------------------ */
-    .news-grid{
-      display:grid;gap:16px;grid-template-columns:repeat(3,1fr);
-    }
-    @media (max-width:992px){
-      .news-grid{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:560px){
-      .news-grid{grid-template-columns:1fr}
-    }
-    .news{
-      border-radius:14px;overflow:hidden;border:1px solid var(--border);
-      display:flex;flex-direction:column;background:#fff;box-shadow: var(--shadow);
-      transition:.2s
-    }
-    .news:hover{transform: translateY(-2px)}
-    .news img{aspect-ratio:16/9;object-fit:cover;width:100%}
-    .news .b{padding:12px 14px}
-    .news h4{margin:0 0 6px;font-size:1rem}
-    .news p{margin:0;color:#475569;font-size:.95rem}
-  </style>
-</head>
-<body>
-  <main class="page">
+  /* feature chips */
+  .intro-features{
+    display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; animation:fadeUp .55s .25s both;
+  }
+  .feat{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:9px 12px; border-radius:999px; font:600 12px/1 Inter;
+    background:rgba(255,255,255,.06); border:1px solid rgba(148,163,184,.26); color:#e7eeff;
+    transition:.2s transform,.2s box-shadow,.2s background;
+  }
+  .feat:hover{ transform:translateY(-2px); box-shadow:0 10px 28px rgba(46,110,250,.25); background:rgba(255,255,255,.10); }
+  .feat svg{ width:14px; height:14px; color:#60a5fa }
 
-    <!-- I) VIDEO SLIDER (autoplay, arrows, dots) -->
-    <section class="slider section" id="slider">
-      <button class="nav-btn nav-left" aria-label="Prev">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/></svg>
-      </button>
-      <button class="nav-btn nav-right" aria-label="Next">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/></svg>
-      </button>
-      <!-- slides injected by JS -->
-      <div class="dots" id="sliderDots"></div>
-    </section>
+  /* topics row */
+  .lang-wrap{ margin-top:18px; }
+  .langs{ display:flex; flex-wrap:wrap; gap:10px; }
+  .lang{
+    --del:0s;
+    display:inline-flex; align-items:center; gap:8px;
+    background:#0d1326; color:#eaf2ff; border:1px solid rgba(147,197,253,.28);
+    padding:9px 12px; border-radius:12px; font:600 12px/1 Inter;
+    box-shadow:0 8px 22px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.03);
+    animation:dropIn .45s var(--del) both ease-out;
+  }
+  .lang .dot{ width:8px; height:8px; border-radius:999px; background:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,.25); }
+  @keyframes dropIn { from{ opacity:0; transform: translateY(-10px) scale(.98) } to{ opacity:1; transform:none } }
 
-    <!-- II) Websites I Use — Mac window -->
-    <section class="section">
-      <div class="mac-window">
+  /* CTA */
+  .cta-row{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:20px; }
+  .btn{
+    display:inline-flex; align-items:center; gap:10px; cursor:pointer;
+    padding:12px 16px; border-radius:12px; font:700 14px/1 Inter; letter-spacing:.2px;
+    border:1px solid rgba(147,197,253,.35);
+    background:linear-gradient(180deg, #1e293b 0%, #111827 100%);
+    color:#eaf2ff; text-decoration:none;
+    box-shadow:0 14px 34px rgba(30,58,138,.45);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 18px 40px rgba(30,58,138,.55); }
+  .btn svg{ width:16px; height:16px }
+
+  .ghost-link{
+    font:600 13px/1 Inter; color:#cfe3ff; text-decoration:none; border-bottom:1px dashed #93c5fd;
+  }
+  .ghost-link:hover{ border-bottom-style:solid }
+
+  /* ===== RIGHT HERO LOGO (added) ===== */
+  .intro-logo-right{
+    display:flex; justify-content:flex-end; align-items:center;
+  }
+  .logo-stack{
+    position:relative;
+    width:140px; height:140px;
+    border-radius:24px;
+    background:#ffffff;                /* white tile like in your screenshot */
+    box-shadow:0 18px 40px rgba(0,0,0,.28);
+    border:1px solid rgba(255,255,255,.16);
+    overflow:hidden;
+  }
+  .logo-stack img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    transition:transform .7s ease, opacity .7s ease, filter .7s ease;
+    will-change:transform, opacity;
+  }
+  /* front: B Labs mark (centered, contained) */
+  .logo-front{
+    background:#0e152a;
+    padding:10px;
+    object-fit:contain;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+  }
+  /* back: portrait starts slightly hidden to the right/bottom */
+  .logo-back{
+    opacity:0;
+    transform: translate(26px, 12px) scale(.92);
+  }
+  /* after reveal: back comes in, front scales + slides out */
+  .logo-stack.reveal .logo-back{
+    opacity:1;
+    transform: translate(0,0) scale(1);
+  }
+  .logo-stack.reveal .logo-front{
+    opacity:0;
+    transform: translate(-20px,-10px) scale(.84) rotate(-1deg);
+    filter: blur(.2px);
+  }
+
+  /* ========= HERO #2 (existing) ========= */
+  .hero{ display:grid; grid-template-columns:1.4fr .9fr; gap:20px; align-items:stretch; }
+  .billboard{
+    position:relative; border-radius:18px; overflow:hidden;
+    background:linear-gradient(180deg,#0b0b12,#171726);
+    min-height:420px; color:#fff; box-shadow:0 30px 60px rgba(0,0,0,.25);
+  }
+  .billboard .img{
+    position:absolute; inset:0; opacity:.28; mix-blend-mode:screen;
+    background-size:cover; background-position:center;
+  }
+  .billboard .glow{
+    position:absolute; inset:-20%;
+    background:
+      radial-gradient(60% 40% at 70% 30%, var(--neon2) 0%, transparent 60%),
+      radial-gradient(40% 30% at 30% 70%, var(--neon) 0%, transparent 60%);
+    opacity:.22; filter:blur(30px);
+  }
+  .hero-copy{ position:relative; z-index:2; padding:28px; display:flex; flex-direction:column; height:100%; }
+  .kicker{ font:600 12px/1 Inter; letter-spacing:.5px; text-transform:uppercase; color:#c7e9ff; opacity:.9; }
+  .hed{ font-family:"Playfair Display",serif; font-size:clamp(30px,3.8vw,48px); line-height:1.05; margin:8px 0 12px; transition:opacity .18s ease; }
+  .dek{ color:#cfd7ff; max-width:60ch; }
+  .meta{ font:600 12px/1 Inter; color:#a4a9bd; margin-top:10px; }
+  .hidden-titles{ display:none; }
+
+  /* RIGHT STACK */
+  .stack{ display:grid; gap:14px; }
+
+  /* Mac window shell */
+  .mac{
+    background:var(--code-bg);
+    border:1px solid var(--code-border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .mac-top{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 12px; background:var(--code-top);
+    border-bottom:1px solid var(--code-border);
+  }
+  .dot{ width:12px; height:12px; border-radius:50%; }
+  .dot.r{ background:#ef4444; } .dot.y{ background:#eab308; } .dot.g{ background:#22c55e; }
+
+  /* Mac Video */
+  .video-wrap{ padding:12px; }
+  .slider{
+    position:relative; width:100%;
+    aspect-ratio:16/9; border-radius:12px; overflow:hidden;
+    background:#000; border:1px solid var(--code-border);
+  }
+  .slide{ position:absolute; inset:0; opacity:0; transition:opacity var(--fade-dur) ease; }
+  .slide.active{ opacity:1; }
+  .slide iframe, .slide img{ width:100%; height:100%; border:0; display:block; object-fit:cover; }
+
+  .thumb-wrap{ position:relative; width:100%; height:100%; cursor:pointer; }
+  .yt-overlay{ position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; }
+  .yt-play{
+    width:74px; height:74px; border-radius:50%;
+    background:rgba(0,0,0,.45); display:grid; place-items:center;
+    box-shadow:0 8px 24px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.18);
+    transition:.2s;
+  }
+  .thumb-wrap:hover .yt-play{ background:rgba(0,0,0,.6); }
+  .yt-play svg{ width:28px; height:28px; color:#fff; margin-left:4px; }
+
+  .v-nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:38px; height:38px; border-radius:999px;
+    background:rgba(255,255,255,.12); backdrop-filter:blur(4px);
+    border:1px solid var(--code-border); color:#fff;
+    display:grid; place-items:center; cursor:pointer; opacity:.7; transition:.2s; z-index:3;
+  }
+  .v-nav:hover{ opacity:1; }
+  .v-left{ left:10px; } .v-right{ right:10px; }
+  .v-nav svg{ width:18px; height:18px; }
+
+  /* Useful Websites */
+  .sites{ padding:14px 12px 8px; }
+  .sites h2{ color:#e5e7eb; font-size:1rem; margin:0 0 10px; font-weight:700; }
+  .code-pad{
+    background:#0f172a; border:1px solid var(--code-border);
+    border-radius:12px; padding:14px; overflow:auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.18) transparent;
+
+    overflow-y:auto;    /* SCROLL əlavə olunur */
+    max-height:260px;   /* Hündürlük limit */
+  }
+  .code-pad::-webkit-scrollbar {
+    width: 8px;
+}
+
+  .code-list{
+    font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    color:#9fb4a2; margin:0;
+  }
+  .code-list a{ color:#22c55e; text-decoration:none; }
+  .code-list a:hover{ text-decoration:underline; }
+
+  /* AI Deck + arrows (no scrollbar) */
+  .section{ margin-top:26px; }
+  .section .head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .label{ font:800 18px/1 Inter; letter-spacing:.2px; }
+
+  .deck-wrap{ position:relative; isolation:isolate; }
+  .deck{
+    display:grid; grid-auto-flow:column; grid-auto-columns:minmax(260px,300px);
+    gap:14px; overflow:auto; scroll-snap-type:x mandatory;
+    padding:0 64px 4px; scrollbar-width:none;
+  }
+  .deck::-webkit-scrollbar{ display:none; }
+
+  .deck-btn{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:40px; height:40px; border-radius:999px;
+    background:#fff; border:1px solid #e5e7eb; box-shadow:0 10px 26px rgba(0,0,0,.10);
+    display:grid; place-items:center; cursor:pointer; opacity:.95;
+    z-index:5; pointer-events:auto;
+  }
+  .deck-btn:hover{ box-shadow:0 12px 32px rgba(0,0,0,.14); }
+  .deck-prev{ left:8px; } .deck-next{ right:8px; }
+  .deck-btn svg{ width:18px; height:18px; color:#111; }
+
+  .card{
+    position:relative; z-index:1;
+    scroll-snap-align:start; border:1px solid var(--ring); border-radius:16px; overflow:hidden; background:#fff;
+    display:flex; flex-direction:column; min-height:320px;
+    transition:transform .2s ease, box-shadow .2s ease;
+    text-decoration:none; color:inherit;
+  }
+  .card:hover{ transform:translateY(-4px); box-shadow:0 16px 36px rgba(0,0,0,.12); }
+  .poster{ aspect-ratio:16/9; background:#eaeaf0; }
+  .poster img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .pad{ padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px; }
+  .topic{ font:700 11px/1 Inter; letter-spacing:.5px; text-transform:uppercase; color:var(--neon); }
+  .title{ font:800 16px/1.2 Inter; }
+  .summary{
+    color:var(--muted); font:400 14px/1.4 Inter;
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; line-clamp:3; overflow:hidden;
+  }
+  .source{ margin-top:auto; font:600 12px/1 Inter; color:#8c8c96; }
+
+  @media (max-width:900px){
+    .hero{ grid-template-columns:1fr; }
+    .deck{ padding:0 56px 4px; }
+    .deck-prev{ left:6px; } .deck-next{ right:6px; }
+    .intro-hero{ grid-template-columns:1fr; padding:22px 18px; }
+    .intro-logo-right{ justify-content:center; margin-top:18px; }
+  }
+
+  /* ===== Footer (white, merged) ===== */
+  .blabs-footer{
+    width:100vw;
+    margin-left:calc(50% - 50vw);
+    margin-right:calc(50% - 50vw);
+    background:#ffffff;
+    border-top:1px solid #e5e7eb;
+    color:#111827;
+    margin-top:40px;
+  }
+  .blabs-footer-inner{
+    max-width:1200px; margin:0 auto; padding:32px 20px;
+    display:grid; grid-template-columns:2fr 1fr 1fr; gap:32px;
+  }
+  .blabs-col a{
+    display:block; color:#374151; text-decoration:none; font:600 14px/1.8 Inter;
+  }
+  .blabs-col a:hover{ color:#111827; text-decoration:underline; }
+  .blabs-brand{ display:flex; align-items:flex-start; gap:16px; }
+  .blabs-brand img{ width:48px; height:48px; object-fit:contain; }
+  .blabs-title{ font:800 18px/1 Inter; margin-bottom:6px; }
+  .blabs-desc{ font:400 13px/1.6 Inter; color:#6b7280; max-width:60ch; }
+  .blabs-head{ font:800 13px/1 Inter; text-transform:uppercase; letter-spacing:.4px; color:#1f2937; margin-bottom:10px; }
+  .blabs-footer-bottom{ text-align:center; padding:14px 20px; font:600 13px/1 Inter; color:#6b7280; border-top:1px solid #e5e7eb; }
+
+  /* Page-specific: remove gap under navbar, prevent sideways scroll from full-bleed hero */
+  main { padding-top:0 !important; }
+  .navbar { margin-bottom:0 !important; }
+  .intro-hero-outer { margin-top:0 !important; }
+  html, body { overflow-x:hidden; }
+</style>
+
+<!-- ===== FULL-BLEED HERO #1 ===== -->
+<section class="intro-hero-outer">
+  <div class="intro-hero" aria-labelledby="intro-title">
+    <!-- left spacer (kept visually empty) -->
+    <div class="intro-spacer"></div>
+
+    <!-- main copy -->
+    <div class="intro-main">
+      <h2 id="intro-title" class="intro-title">Explore and learn with me</h2>
+      <p class="intro-sub">
+        This platform is a clean space to explore technology, understand real concepts, and learn through practice.
+        Everything here is built to help you improve step by step.
+      </p>
+
+      <div class="intro-features">
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Learn
+        </div>
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m-4-4h8"/></svg>
+          Take tests
+        </div>
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 7 9 6 9-6-9-4-9 4z"/></svg>
+          Ask questions
+        </div>
+        <div class="feat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8M12 17V3m0 0L7 8m5-5 5 5"/></svg>
+          Find code examples
+        </div>
+      </div>
+
+      <!-- topics -->
+      <div class="lang-wrap">
+        <div class="langs">
+          <span class="lang" style="--del:.0s;"><span class="dot"></span>Python basics</span>
+          <span class="lang" style="--del:.05s;"><span class="dot"></span>Databases & authentication</span>
+          <span class="lang" style="--del:.15s;"><span class="dot"></span>Automations</span>
+          <span class="lang" style="--del:.35s;"><span class="dot"></span>Prompt engineering</span>
+          <span class="lang" style="--del:.45s;"><span class="dot"></span>Web development basics</span>
+          <span class="lang" style="--del:.55s;"><span class="dot"></span>Real projects</span>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-row">
+        <a class="btn" href="mailto:elvinbabanli0@gmail.com?subject=Join%20Babanli%20Labs&body=Hi%20Elvin%2C%20I%27d%20love%20to%20collaborate%20on%20a%20project." rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2m18 0v-2a4 4 0 0 0-3-3.87M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4m6-4a3 3 0 1 1-3-3"/>
+          </svg>
+          Join the team
+        </a>
+      </div>
+    </div>
+
+    <!-- RIGHT: animated logo (added) -->
+    <!-- <div class="intro-logo-right">
+      <div class="logo-stack" id="heroLogo">
+        <img class="logo-front" src="{% static 'img/babanli_labs_logo.png' %}" alt="B Labs logo">
+        <img class="logo-back"  src="{% static 'img/elvin-profile.png' %}" alt="Elvin portrait">
+      </div>
+    </div> -->
+
+  </div>
+</section>
+
+<div class="wrap">
+
+  <!-- ============ HERO #2 — existing ============ -->
+  <section class="hero">
+    <!-- BILLBOARD -->
+    <div class="billboard">
+      {% if articles and articles.0 %}
+        <div class="img" style="background-image:url('{{ articles.0.image_url }}');"></div>
+      {% else %}
+        <div class="img" style="background-image:url('https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop');"></div>
+      {% endif %}
+      <div class="glow"></div>
+      <div class="hero-copy">
+        <div class="kicker">Today in Tech</div>
+        <h1 class="hed" id="hero-hed">
+          {% if articles and articles.0 %}{{ articles.0.title|truncatechars:110 }}{% else %}Modern AI & Code — Curated for Builders{% endif %}
+        </h1>
+        <p class="dek">Fresh AI, programming and Big Tech news. Scrollable decks, neon accents — maximum focus with minimal scrolling.</p>
+        <div class="meta">{{ now|date:"l, F j, Y" }} • Warsaw Edition</div>
+
+        <!-- titles for rotator -->
+        <div class="hidden-titles" id="hero-titles">
+          {% for a in articles|slice:"0:6" %}
+            <span data-title="{{ a.title|escape }}"></span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT STACK: Mac Video + Useful Websites -->
+    <div class="stack">
+      <!-- Mac window — Video -->
+      <section class="mac">
         <div class="mac-top">
-          <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        </div>
+        <div class="video-wrap">
+          <div class="slider" id="slider">
+            <button class="v-nav v-left" aria-label="Prev">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+              </svg>
+            </button>
+            <button class="v-nav v-right" aria-label="Next">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
+              </svg>
+            </button>
+            <!-- slides injected by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Mac window — Useful Websites -->
+      <section class="mac">
+        <div class="mac-top">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
         </div>
         <div class="sites">
-          <h2 class="title">Websites I Use</h2>
-          <p class="muted" style="margin:0 0 14px">Quick access to my daily tools</p>
-          <div class="sites-grid">
-            <a href="https://same.new/" target="_blank" class="site-card"><strong>same.new</strong><small>https://same.new/</small></a>
-            <a href="https://stackoverflow.com/" target="_blank" class="site-card"><strong>Stack Overflow</strong><small>https://stackoverflow.com/</small></a>
-            <a href="https://21st.dev/community/components" target="_blank" class="site-card"><strong>21st.dev Components</strong><small>https://21st.dev/community/components</small></a>
-            <a href="https://chathub.gg/" target="_blank" class="site-card"><strong>ChatHub</strong><small>https://chathub.gg/</small></a>
-            <a href="https://www.enki.com/" target="_blank" class="site-card"><strong>Enki</strong><small>https://www.enki.com/</small></a>
-            <a href="https://www.n2yo.com/api/" target="_blank" class="site-card"><strong>N2YO API</strong><small>https://www.n2yo.com/api/</small></a>
-            <a href="https://www.data.com/" target="_blank" class="site-card"><strong>Data.com</strong><small># https://www.data.com/</small></a>
+          <h2>Useful Websites</h2>
+          <div class="code-pad">
+            <pre class="code-list">
+<a href="https://same.new/" target="_blank"># https://same.new/</a>
+<a href="https://stackoverflow.com/" target="_blank"># https://stackoverflow.com/</a>
+<a href="https://21st.dev/community/components" target="_blank"># https://21st.dev/community/components</a>
+<a href="https://chathub.gg/" target="_blank"># https://chathub.gg/</a>
+<a href="https://www.enki.com/" target="_blank"># https://www.enki.com/</a>
+<a href="https://www.n2yo.com/api/" target="_blank"># https://www.n2yo.com/api/</a>
+<a href="https://www.data.com/" target="_blank"># https://www.data.com/</a>
+<a href="https://devdocs.io/" target="_blank"># https://devdocs.io/</a>
+<a href="https://roadmap.sh/" target="_blank"># https://roadmap.sh/</a>
+<a href="https://regex101.com/" target="_blank"># https://regex101.com/</a>
+<a href="https://jsoncrack.com/" target="_blank"># https://jsoncrack.com/</a>
+<a href="https://www.postman.com/explore" target="_blank"># https://www.postman.com/explore</a>
+<a href="https://replit.com/" target="_blank"># https://replit.com/</a>
+<a href="https://codesandbox.io/" target="_blank"># https://codesandbox.io/</a>
+<a href="https://github1s.com/" target="_blank"># https://github1s.com/</a>
+<a href="https://freecodecamp.org/" target="_blank"># https://freecodecamp.org/</a>
+<a href="https://overapi.com/" target="_blank"># https://overapi.com/</a>
+<a href="https://cssbattle.dev/" target="_blank"># https://cssbattle.dev/</a>
+<a href="https://ui.shadcn.com/" target="_blank"># https://ui.shadcn.com/</a>
+<a href="https://phind.com/" target="_blank"># https://phind.com/</a>
+<a href="https://omni.studio/" target="_blank"># https://omni.studio/</a>
+<a href="https://rapidapi.com/" target="_blank"># https://rapidapi.com/</a>
+<a href="https://apipost.com/" target="_blank"># https://apipost.com/</a>
+<a href="https://metatags.io/" target="_blank"># https://metatags.io/</a>
+<a href="https://tinywow.com/" target="_blank"># https://tinywow.com/</a>
+<a href="https://jwt.io/" target="_blank"># https://jwt.io/</a>
+<a href="https://http.cat/" target="_blank"># https://http.cat/</a>
+<a href="https://httpstatus.io/" target="_blank"># https://httpstatus.io/</a>
+<a href="https://uxdesign.cc/" target="_blank"># https://uxdesign.cc/</a>
+<a href="https://systemdesign.one/" target="_blank"># https://systemdesign.one/</a>
+<a href="https://excalidraw.com/" target="_blank"># https://excalidraw.com/</a>
+<a href="https://app.diagrams.net/" target="_blank"># https://app.diagrams.net/</a>
+<a href="https://deepai.org/" target="_blank"># https://deepai.org/</a>
+
+            </pre>
           </div>
         </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ============ AI SECTION ============ -->
+  <section class="section">
+    <div class="head">
+      <div class="label">AI — Latest Models & Research</div>
+    </div>
+
+    <div class="deck-wrap">
+      <button class="deck-btn deck-prev" type="button" aria-label="Prev">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 19-7-7 7-7"/>
+        </svg>
+      </button>
+      <div class="deck" id="aiDeck">
+        {% with ai_list=articles_ai|default:articles %}
+          {% for a in ai_list|slice:":12" %}
+            <a class="card" href="{{ a.url }}" target="_blank" rel="noopener">
+              <div class="poster">
+                <img src="{{ a.image_url|default:'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=1400&auto=format&fit=crop' }}" alt="">
+              </div>
+              <div class="pad">
+                <div class="topic">AI</div>
+                <div class="title">{{ a.title }}</div>
+                <div class="summary">{{ a.summary|default:"" }}</div>
+                <div class="source">{{ a.source|default:"" }}</div>
+              </div>
+            </a>
+          {% empty %}
+            <div class="card"><div class="pad"><div class="title">No AI news yet.</div></div></div>
+          {% endfor %}
+        {% endwith %}
       </div>
-    </section>
+      <button class="deck-btn deck-next" type="button" aria-label="Next">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </section>
 
-    <!-- III) Projects -->
-    <section class="section">
-      <h2 class="title">Projects</h2>
-      <div class="projects-grid">
-        <article class="card">
-          <h3>PDF Summarizer</h3>
-          <p class="muted">Large PDF files converted into clean short summaries using AI.</p>
-          <div class="links">
-            <a class="link" href="https://summerizer-ubum.onrender.com/" target="_blank">Live</a>
-            <a class="link" href="https://www.linkedin.com/feed/update/urn:li:activity:7391036469328433152/" target="_blank">LinkedIn</a>
-          </div>
-        </article>
+</div>
 
-        <article class="card">
-          <h3>Exam Passer</h3>
-          <p class="muted">AI-assisted tool that helps users pass exams by automating study assistance.</p>
-          <div class="links">
-            <a class="link" href="https://www.linkedin.com/feed/update/urn:li:activity:7386493560302350336/" target="_blank">LinkedIn</a>
-          </div>
-        </article>
-
-        <article class="card">
-          <h3>Future Project</h3>
-          <p class="muted">Reserved for next portfolio tool.</p>
-        </article>
+<!-- ===== MERGED WHITE FOOTER ===== -->
+<footer class="blabs-footer">
+  <div class="blabs-footer-inner">
+    <!-- LEFT: Brand -->
+    <div class="blabs-col blabs-brand">
+      <img src="{% static 'img/babanli_labs_logo.png' %}" alt="Babanlı Labs Logo">
+      <div>
+        <div class="blabs-title">Babanlı Labs</div>
+        <div class="blabs-desc">
+          Personal lab by Elvin Babanlı — experiments in AI, web apps and developer tooling.
+          News feed is API-driven; visuals show real article images only.
+        </div>
       </div>
-    </section>
+    </div>
 
-    <!-- IV) News -->
-    <section class="section" style="margin-top:38px">
-      <h2 class="title">News</h2>
-      <div class="news-grid">
-        <a class="news" href="https://news.ycombinator.com/" target="_blank" rel="noopener">
-          <img src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop" alt="">
-          <div class="b">
-            <h4>Hacker News — Top stories</h4>
-            <p>Daily top tech stories curated by the community. Quick pulse on the industry.</p>
-          </div>
-        </a>
-        <a class="news" href="https://arxiv.org/" target="_blank" rel="noopener">
-          <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200&auto=format&fit=crop" alt="">
-          <div class="b">
-            <h4>arXiv — AI & CS preprints</h4>
-            <p>Fresh research straight from labs. Great for staying ahead on ML trends.</p>
-          </div>
-        </a>
-        <a class="news" href="https://blog.google/technology/ai/" target="_blank" rel="noopener">
-          <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1200&auto=format&fit=crop" alt="">
-          <div class="b">
-            <h4>Google AI Blog</h4>
-            <p>Official updates on Google’s AI research and product features.</p>
-          </div>
-        </a>
+    <!-- CENTER: Navigation -->
+    <div class="blabs-col">
+      <div class="blabs-head">Navigate</div>
+      <a href="/">Home</a>
+      <a href="/#aiDeck">AI News</a>
+      <a href="/#slider">Videos</a>
+    </div>
 
-        <!-- optional more -->
-        <a class="news" href="https://openai.com/news" target="_blank" rel="noopener">
-          <img src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200&auto=format&fit=crop" alt="">
-          <div class="b">
-            <h4>OpenAI — News</h4>
-            <p>Model releases, safety research, developer updates, and partnerships.</p>
+    <!-- RIGHT: Contact -->
+    <div class="blabs-col">
+      <div class="blabs-head">Contact</div>
+      <a href="mailto:elvinbabanli0@gmail.com">elvinbabanli0@gmail.com</a>
+      <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+
+  <div class="blabs-footer-bottom">
+    © {{ now|date:"Y" }} Babanlı Labs — Warsaw, Poland • Elvin’s CodeBase
+  </div>
+</footer>
+
+<script>
+  /* ===== HERO title auto-rotate (optional) ===== */
+  (function(){
+    var box = document.getElementById('hero-titles');
+    var hed = document.getElementById('hero-hed');
+    if(!box || !hed) return;
+    var spans = box.querySelectorAll('[data-title]');
+    if(spans.length < 2) return;
+
+    var titles = []; for(var i=0;i<spans.length;i++){ titles.push(spans[i].getAttribute('data-title')); }
+    var idx = 0;
+    setInterval(function(){
+      idx = (idx + 1) % titles.length;
+      hed.style.opacity = '0';
+      setTimeout(function(){ hed.textContent = titles[idx]; hed.style.opacity = '1'; }, 180);
+    }, 3500);
+  })();
+
+  /* ===== YouTube fade slider inside Mac ===== */
+  (function(){
+    const videos = ["FOGRHBp6lvM","JZZr0PjZsIk","Y0dLgtF4IHM","QM5XDc4NQJo","1lwddP0KUEg"];
+    const slider = document.getElementById('slider');
+    if (!slider) return;
+
+    const left  = slider.querySelector('.v-left');
+    const right = slider.querySelector('.v-right');
+
+    let idx = 0, timer = null, D = 3600;
+    let playing = false;
+
+    const thumbUrl = id => `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+    const watchUrl = id => `https://www.youtube.com/watch?v=${id}`;
+    const embedUrl = id => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=0&rel=0&playsinline=1&modestbranding=1&enablejsapi=1`;
+
+    function clearSlides(){ slider.querySelectorAll('.slide').forEach(s => s.remove()); }
+    function mountWithFade(el){
+      el.classList.add('slide'); slider.appendChild(el);
+      requestAnimationFrame(()=>{ el.classList.add('active'); });
+      const prevs = slider.querySelectorAll('.slide');
+      if (prevs.length > 1){
+        const old = prevs[0]; old.classList.remove('active'); setTimeout(()=> old.remove(), 600);
+      }
+    }
+    function mountThumb(i){
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <div class="thumb-wrap">
+          <img src="${thumbUrl(videos[i])}" alt="YouTube video thumbnail">
+          <div class="yt-overlay">
+            <div class="yt-play" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
           </div>
-        </a>
-        <a class="news" href="https://aws.amazon.com/blogs/aws/" target="_blank" rel="noopener">
-          <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200&auto=format&fit=crop" alt="">
-          <div class="b">
-            <h4>AWS Official Blog</h4>
-            <p>Cloud features, serverless patterns, and enterprise best practices.</p>
-          </div>
-        </a>
-        <a class="news" href="https://vercel.com/blog" target="_blank" rel="noopener">
-          <img src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1200&auto=format&fit=crop" alt="">
-          <div class="b">
-            <h4>Vercel — Blog</h4>
-            <p>Frontend performance, DX tooling, and modern web workflow insights.</p>
-          </div>
-        </a>
-      </div>
-    </section>
-  </main>
+        </div>`;
+      const host = wrap.firstElementChild;
+      host.style.cursor = 'pointer';
+      host.addEventListener('click', ()=> tryEmbed(videos[i]).catch(()=>{ window.open(watchUrl(videos[i]), '_blank', 'noopener'); }));
+      mountWithFade(wrap.firstElementChild.parentElement);
+    }
+    function tryEmbed(id){
+      return new Promise((resolve, reject)=>{
+        const shell = document.createElement('div');
+        const frame = document.createElement('iframe');
+        frame.src = embedUrl(id);
+        frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        frame.referrerPolicy = "origin-when-cross-origin";
+        frame.allowFullscreen = true;
+        shell.appendChild(frame);
+        mountWithFade(shell);
+        playing = true; stop();
 
-  <script>
-    // ------------------------------
-    // VIDEO SLIDER (no external libs)
-    // ------------------------------
-    (function(){
-      const videos = [
-        "FOGRHBp6lvM",
-        "JZZr0PjZsIk",
-        "Y0dLgtF4IHM",
-        "QM5XDc4NQJo",
-        "1lwddP0KUEg"
-      ];
-      const slider = document.getElementById('slider');
-      const dotsWrap = document.getElementById('sliderDots');
+        const t = setTimeout(()=>reject(new Error('embed-timeout')), 1500);
+        frame.onload = ()=>{ clearTimeout(t); resolve(); };
 
-      let idx = 0;
-      let timer = null;
-      const DURATION = 3800; // 3.8s
-
-      // build slides
-      videos.forEach((id, i)=>{
-        const s = document.createElement('div');
-        s.className = 'slide';
-        if (i===0) s.classList.add('active');
-        slider.appendChild(s);
-
-        const d = document.createElement('div');
-        d.className = 'dot' + (i===0?' active':'');
-        d.addEventListener('click', ()=>go(i, true));
-        dotsWrap.appendChild(d);
+        function onMsg(ev){
+          try{
+            if (!String(ev.origin).includes("youtube")) return;
+            const data = typeof ev.data === "string" ? JSON.parse(ev.data) : ev.data;
+            if (data && data.event === "onStateChange"){
+              if (data.info === 0){ playing = false; start(); next(); }
+            } else if (data && data.event === "infoDelivery" && typeof data.info === "number"){
+              if (data.info === 1){ playing = true; stop(); }
+            }
+          }catch(_){}
+        }
+        frame.addEventListener('load', ()=>{
+          try{
+            frame.contentWindow.postMessage(JSON.stringify({ event:"listening", id:"elvin-player" }), "*");
+            frame.contentWindow.postMessage(JSON.stringify({ event:"command", func:"addEventListener", args:["onStateChange"] }), "*");
+          }catch(_){}
+        });
+        window.addEventListener('message', onMsg, { passive:true });
       });
+    }
+    function next(){ idx = (idx+1)%videos.length; mountThumb(idx); }
+    function prev(){ idx = (idx-1+videos.length)%videos.length; mountThumb(idx); }
+    function start(){ if (!playing && !timer) timer = setInterval(next, D); }
+    function stop(){ if (timer){ clearInterval(timer); timer=null; } }
 
-      const slides = [...slider.querySelectorAll('.slide')];
-      const dots = [...dotsWrap.querySelectorAll('.dot')];
+    left  && left.addEventListener('click', ()=>{ prev(); stop(); start(); });
+    right && right.addEventListener('click', ()=>{ next(); stop(); start(); });
 
-      function ytURL(id){
-        // muted autoplay, no controls
-        return `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&rel=0&playsinline=1&modestbranding=1`;
-      }
+    slider.addEventListener('mouseenter', stop);
+    slider.addEventListener('mouseleave', start);
 
-      function setSrc(el, id){
-        el.innerHTML = ''; // clear old iframe if any
-        const ifr = document.createElement('iframe');
-        ifr.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-        ifr.allowFullscreen = true;
-        ifr.src = ytURL(id);
-        el.appendChild(ifr);
-      }
+    clearSlides(); mountThumb(0); start();
+  })();
 
-      // initialize first
-      setSrc(slides[0], videos[0]);
+  /* ===== Deck arrow buttons ===== */
+  (function(){
+    const deck = document.getElementById('aiDeck');
+    if(!deck) return;
+    const prev = document.querySelector('.deck-prev');
+    const next = document.querySelector('.deck-next');
 
-      function go(n, manual=false){
-        if (n===idx) return;
-        // stop old
-        slides[idx].classList.remove('active');
-        slides[idx].innerHTML = ''; // remove iframe to stop playback
-        dots[idx].classList.remove('active');
+    function scrollByCards(dir){
+      const card = deck.querySelector('.card');
+      const w = card ? card.getBoundingClientRect().width + 14 : 300;
+      deck.scrollBy({ left: dir * w * 1.2, behavior:'smooth' });
+    }
+    prev && prev.addEventListener('click', ()=> scrollByCards(-1));
+    next && next.addEventListener('click', ()=> scrollByCards(1));
+  })();
 
-        idx = (n + videos.length) % videos.length;
+  /* ===== Reveal the portrait behind the B Labs logo after 5s ===== */
+  (function(){
+    const stack = document.getElementById('heroLogo');
+    if(!stack) return;
+    setTimeout(()=> stack.classList.add('reveal'), 5000);
+  })();
+</script>
 
-        // start new
-        slides[idx].classList.add('active');
-        setSrc(slides[idx], videos[idx]);
-        dots[idx].classList.add('active');
-
-        if (manual) restart();
-      }
-
-      function next(){ go(idx+1) }
-      function prev(){ go(idx-1) }
-
-      function start(){ timer = setInterval(next, DURATION) }
-      function stop(){ clearInterval(timer); timer=null }
-      function restart(){ stop(); start() }
-
-      // arrows
-      slider.querySelector('.nav-left').addEventListener('click', ()=>go(idx-1, true));
-      slider.querySelector('.nav-right').addEventListener('click', ()=>go(idx+1, true));
-
-      // pause on hover
-      slider.addEventListener('mouseenter', stop);
-      slider.addEventListener('mouseleave', start);
-
-      start();
-    })();
-  </script>
-</body>
-</html>
+{% endblock %}
