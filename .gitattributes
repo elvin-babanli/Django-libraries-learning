@@ -1,0 +1,21 @@
+# Kod fayllarını LF ilə saxla
+*.py   text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+
+# Binarilərə toxunma
+*.png  -text
+*.jpg  -text
+*.jpeg -text
+*.svg  -text
+*.ico  -text
+*.woff -text
+*.woff2 -text
+*.eot  -text
+*.ttf  -text
+
+# collectstatic çıxışını olduğu kimi saxla (EOL çevirmə, xəbərdarlıq olmasın)
+staticfiles/** -text

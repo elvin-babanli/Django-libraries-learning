@@ -1,11 +1,10 @@
-fastapi==0.110.0
-uvicorn[standard]==0.29.0
-python-dotenv==1.0.1
-openai==1.59.5
-requests==2.32.3
-feedparser==6.0.11
-
 Django
 gunicorn
 whitenoise
 asgiref
+fastapi
+uvicorn
+python-dotenv
+openai
+requests
+feedparser
