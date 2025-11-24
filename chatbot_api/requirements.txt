@@ -8,3 +8,4 @@ feedparser==6.0.11
 Django
 gunicorn
 whitenoise
+asgiref
