@@ -97,8 +97,16 @@ def fetch_news():
 
 
 def home(request):
-    return render(request, "index.html")
-
+    # Boş default-lar veririk ki, template partlamasın
+    context = {
+        "articles": [],       # sonra real data ilə doldurarsan
+        "articles_ai": None,  # yoxdursa None qalır
+        # lazım ola biləcək digər listlər də varsa, hamısına boş dəyər ver:
+        # "projects": [],
+        # "news": [],
+        # "tools": [],
+    }
+    return render(request, "index.html", context)
 def about(request):
     profile = {
         "name": "Elvin Babanlı",
