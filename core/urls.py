@@ -22,6 +22,12 @@ from main.weather_app import weather_project_view
 from main.stock_predictor import stock_predictor_view
 from main.cheap_flight_finder import cheap_flight_finder_view
 
+from django.contrib.sitemaps.views import sitemap
+from main.sitemap import StaticViewSitemap 
+
+sitemaps = {
+    "static": StaticViewSitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,6 +43,7 @@ urlpatterns = [
     path('4o4-page/',get4o4, name='4o4-page'),
     path('stock-predictor/',stock_predictor_view, name="stock-predictor"),
     path('cheap-flight-finder/', cheap_flight_finder_view, name="cheap_flight_finder"),
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path('pandas/',get_pandas,name="pandas")
     
 ]
