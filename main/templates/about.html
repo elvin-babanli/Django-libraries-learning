@@ -24,7 +24,17 @@
         <a href="{{ profile.github }}" target="_blank" class="btn btn-sm btn-dark">GitHub</a>
         <a href="{{ profile.linkedin }}" target="_blank" class="btn btn-sm btn-primary">LinkedIn</a>
         {% if profile.instagram %}
-          <a href="{{ profile.instagram }}" target="_blank" class="btn btn-sm btn-outline-secondary">Instagram</a>
+          <a href="{{ profile.instagram }}" target="_blank"
+        class="btn btn-sm"
+        style="
+            background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+            color: white;
+            border: none;
+            font-weight: 600;
+        ">
+        Instagram
+      </a>
+
         {% endif %}
         <a href="mailto:{{ profile.email }}" class="btn btn-sm btn-outline-dark">Contact</a>
       </div>

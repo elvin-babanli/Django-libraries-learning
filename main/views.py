@@ -113,13 +113,31 @@ def home(request):
 def about(request):
     profile = {
         "name": "Elvin Babanlı",
-        "title": "Computer Engineering Student · Python & JS",
+        "title": "AI Engineer & Web Developer · Python ",
         "location": "Warsaw, Poland",
         "email": "elvinbabanli0@gmail.com",
         "github": "https://github.com/elvin-babanli",
         "linkedin": "https://www.linkedin.com/in/elvin-babanl%C4%B1-740038240/",
-        "instagram": "https://instagram.com/your-username",  # istəsən boş burax
-        "skills": ["Python", "Django", "Flask","Pandas", "JavaScript", "HTML/CSS-Basics", "PostgreSQL-Basics"],
+        "instagram": "https://www.instagram.com/elvin_babanli/",
+        "skills": [
+            "Python",
+            "Django",
+            "Flask",
+            "FastAPI",
+            "REST API",
+            "Machine Learning-Basics",
+            "Pandas",
+            "NumPy",
+            "TensorFlow-Basics",
+            "HTML/CSS",
+            "Bootstrap",
+            "SQL",
+            "PostgreSQL",
+            "Git",
+            "GitHub",
+            "APIs & Integrations",
+            "Automation Scripts"
+        ],
         "projects": [
             {"name":"Django Store","url":"https://github.com/elvin-babanli/Django-store"},
             {"name":"Django CRUD","url":"https://github.com/elvin-babanli/Django-CRUD"},
