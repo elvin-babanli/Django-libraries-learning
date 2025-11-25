@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from main.views import *
 from main import views
 from main.weather_app import weather_project_view
@@ -25,12 +25,17 @@ from main.cheap_flight_finder import cheap_flight_finder_view
 from django.contrib.sitemaps.views import sitemap
 from main.sitemap import StaticViewSitemap 
 
+
+
+
+
 sitemaps = {
     "static": StaticViewSitemap,
 }
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("", include("main.urls")),
     path('', index, name="Mainpage"),
     path('django/',get_django, name="django"),
     path('flask/',get_flask,name="flask"),
@@ -44,6 +49,6 @@ urlpatterns = [
     path('stock-predictor/',stock_predictor_view, name="stock-predictor"),
     path('cheap-flight-finder/', cheap_flight_finder_view, name="cheap_flight_finder"),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
-    path('pandas/',get_pandas,name="pandas")
+    path('pandas/',get_pandas,name="pandas"),
     
 ]
