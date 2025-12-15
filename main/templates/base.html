@@ -13,12 +13,12 @@
     {% block extra_head %}{% endblock %}
 
     <style>
-      /* ====== Global Look & Feel ====== */
       :root{
         --border: rgba(17,24,39,.08);
         --cprimary:#fff;
         --cbdark:#0f172a;
         --cgray:#6b7280;
+        --rose:#ff4da6;
       }
       body {
         background: linear-gradient(180deg, #f8fafc 0%, #ffffff 40%, #f8fafc 100%);
@@ -32,7 +32,7 @@
       main { padding-top: 1.5rem; padding-bottom: 2rem; }
       footer { font-size: 0.8rem; color: #6b7280; }
 
-      /* ======== CHAT LAUNCHER ======== */
+      /* CHAT */
       .chat-launcher{
         position:fixed; right:20px; bottom:20px; width:62px; height:62px; border-radius:50%;
         background:linear-gradient(135deg,#2563eb,#3b82f6);
@@ -44,15 +44,12 @@
       }
       .chat-launcher.show{ opacity:1; transform:translateY(0); }
       .chat-launcher:hover{ box-shadow:0 14px 34px rgba(0,0,0,.45); transform:translateY(-4px); }
-
-      /* typing dots animation */
       .typing-dots{ display:flex; gap:4px; }
       .typing-dots span{ width:8px; height:8px; border-radius:50%; background:white; opacity:.6; animation:bounce 1.2s infinite ease-in-out; }
       .typing-dots span:nth-child(2){ animation-delay:.15s; }
       .typing-dots span:nth-child(3){ animation-delay:.3s; }
       @keyframes bounce{ 0%,80%,100%{ transform:translateY(0); opacity:.4; } 40%{ transform:translateY(-5px); opacity:1; } }
 
-      /* ================= CHAT PANEL ================== */
       .chat-panel{
         position:fixed; right:18px; bottom:18px; z-index:1056;
         width:360px; max-width:calc(100vw - 36px); height:580px;
@@ -61,159 +58,125 @@
         box-shadow: 0 24px 60px rgba(0,0,0,.35); border:none; display:none;
       }
       .chat-panel.open{ display:flex; flex-direction:column; }
-      .chat-header{
-        display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--border);
-        background:linear-gradient(180deg,#fafafa,#fff);
-      }
+      .chat-header{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid var(--border); background:linear-gradient(180deg,#fafafa,#fff); }
       .chat-header .left{ display:flex; align-items:center; gap:10px; }
-      .chat-header .avatar{
-        width:28px; height:28px; border-radius:50%;
-        background-size: cover; background-position: center; background-repeat: no-repeat;
-        background-image: url("{% static 'img/elvin-profile.png' %}");
-        border: 1px solid rgba(17,24,39,.12);
-      }
+      .chat-header .avatar{ width:28px; height:28px; border-radius:50%; background-image:url("{% static 'img/elvin-profile.png' %}"); background-size:cover; background-position:center; border: 1px solid rgba(17,24,39,.12); }
       .chat-header .title{ font-weight:600; font-size:.95rem; color:var(--cbdark); }
       .chat-header .sub{ font-size:.78rem; color:var(--cgray); }
-      .chat-header .icon-btn{
-        width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:#f8fafc; border:1px solid var(--border);
-        color:#111827; cursor:pointer;
-      }
+      .chat-header .icon-btn{ width:34px; height:34px; display:grid; place-items:center; border-radius:10px; background:#f8fafc; border:1px solid var(--border); color:#111827; cursor:pointer; }
       .chat-header .icon-btn:hover{ background:#eef2ff; color:#3b82f6; }
-
       .chat-body { flex:1; overflow-y: auto; padding: 12px 10px 6px 10px; background: linear-gradient(135deg, #eaf2ff, #f6fff4); }
       .chat-body::-webkit-scrollbar{ width:8px; }
       .chat-body::-webkit-scrollbar-thumb{ background:#e5e7eb; border-radius:8px; }
-
-      .bubble{
-        max-width:80%; padding:10px 12px; border-radius:14px; margin:6px 0; font-size:.95rem; line-height:1.35; word-break:break-word;
-        border:1px solid var(--border);
-      }
+      .bubble{ max-width:80%; padding:10px 12px; border-radius:14px; margin:6px 0; font-size:.95rem; line-height:1.35; word-break:break-word; border:1px solid var(--border); }
       .bubble.bot{ background:#f9fafb; color:#111827; border-top-left-radius:6px; }
-      .bubble.user{
-        margin-left:auto; color:white; background:linear-gradient(135deg, rgba(48,108,193,.75), rgba(112,177,237,.75));
-        backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.25); border-top-right-radius:6px;
-      }
-
+      .bubble.user{ margin-left:auto; color:white; background:linear-gradient(135deg, rgba(48,108,193,.75), rgba(112,177,237,.75)); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.25); border-top-right-radius:6px; }
       .typing{ display:inline-flex; gap:4px; align-items:center; }
       .typing .t-dot{ width:6px; height:6px; border-radius:50%; background:#9ca3af; opacity:.6; animation:blink 1.1s infinite ease-in-out; }
       .typing .t-dot:nth-child(2){ animation-delay:.18s }
       .typing .t-dot:nth-child(3){ animation-delay:.36s }
       @keyframes blink{ 0%,80%,100%{opacity:.2} 40%{opacity:1} }
-
       .chat-input{ display:flex; gap:8px; align-items:center; padding:10px; border-top:1px solid var(--border); background:#fff; }
       .chat-input .box{ flex:1; background:#fff; border:1px solid var(--border); border-radius:12px; padding:10px 12px; color:#111827; outline:none; }
       .chat-input .send-btn{ background:#3c98d5; color:#fff; border:none; border-radius:12px; padding:10px 14px; font-weight:600; cursor:pointer; }
 
-      /* ========= Heartbeat Pulse (Ola) ========= */
-      .pulse-ui{ animation: heartbeat 1.1s ease-in-out infinite; transform-origin:center; }
-      .pulse-bubble{ animation: heartbeat 1.1s ease-in-out infinite; transform-origin: 10% 50%; }
-      @keyframes heartbeat{
-        0%{ transform: scale(1); }
-        14%{ transform: scale(1.06); }
-        28%{ transform: scale(1); }
-        42%{ transform: scale(1.08); }
-        70%{ transform: scale(1); }
-        100%{ transform: scale(1); }
-      }
+      /* Ola pulse */
+      .pulse-ui{ animation: heartbeat 1.05s ease-in-out infinite; transform-origin:center; }
+      .pulse-bubble{ animation: heartbeat 1.05s ease-in-out 3; transform-origin: 10% 50%; }
+      @keyframes heartbeat{ 0%{ transform: scale(1);} 20%{ transform: scale(1.07);} 40%{ transform: scale(1);} 60%{ transform: scale(1.11);} 100%{ transform: scale(1);} }
 
-      /* ========= Heart Rain (reused) ========= */
+      /* Heart rain */
       .heart-rain-overlay{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index: 2000; }
-      .hr-heart{
-        position:absolute; top:-10%; will-change: transform, opacity;
-        animation: heartFall var(--dur, 4.6s) linear forwards, heartSpin var(--dur, 4.6s) linear forwards;
-        filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
-        opacity: .95;
+      .hr-heart{ position:absolute; top:-10%; will-change: transform, opacity; animation: heartFall var(--dur, 4.2s) linear forwards, heartSpin var(--dur, 4.2s) linear forwards; filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)); opacity: .95; }
+      @keyframes heartFall{ 0%{ transform: translate3d(var(--x,0px), -12vh, 0) rotate(0deg);} 100%{ transform: translate3d(calc(var(--x,0px) + var(--dx, 0px)), 110vh, 0) rotate(0deg);} }
+      @keyframes heartSpin{ 0%{ transform: translate3d(var(--x,0px), -12vh, 0) rotate(0deg);} 100%{ transform: translate3d(calc(var(--x,0px) + var(--dx, 0px)), 110vh, 0) rotate(360deg);} }
+
+      /* ===== OLAELVIN – CINEMA MODE (30s) ===== */
+      .oe-overlay{ position:fixed; inset:0; background:#000; z-index:3000; pointer-events:none; display:none; }
+      .oe-overlay.show{ display:block; animation: ovFadeIn .6s ease both; }
+      @keyframes ovFadeIn{ from{opacity:0} to{opacity:1} }
+      @keyframes ovFadeOut{ from{opacity:1} to{opacity:0} }
+
+      /* Subtle romantic background (soft particles/waves) */
+      .oe-bg{
+        position:absolute; inset:0; background:
+          radial-gradient(60vw 60vh at 10% 30%, rgba(255,77,166,.15), transparent 60%),
+          radial-gradient(50vw 50vh at 90% 70%, rgba(255,99,132,.12), transparent 60%),
+          radial-gradient(40vw 40vh at 50% 10%, rgba(255,255,255,.06), transparent 60%);
+        animation: bgFloat 14s ease-in-out infinite alternate;
+        opacity:.35;
       }
-      @keyframes heartFall{
-        0%{ transform: translate3d(var(--x,0px), -12vh, 0) rotate(0deg); }
-        100%{ transform: translate3d(calc(var(--x,0px) + var(--dx, 0px)), 110vh, 0) rotate(0deg); }
-      }
-      @keyframes heartSpin{
-        0%{ transform: translate3d(var(--x,0px), -12vh, 0) rotate(0deg); }
-        100%{ transform: translate3d(calc(var(--x,0px) + var(--dx, 0px)), 110vh, 0) rotate(360deg); }
+      @keyframes bgFloat{
+        0%{ transform:translate3d(0,0,0); }
+        100%{ transform:translate3d(0,-2.5vh,0); }
       }
 
-      /* ========= NEW: OLAELVIN CINEMA MODE ========= */
-      .oe-overlay{
-        position:fixed; inset:0; background:#000; z-index:3000; pointer-events:none; display:none;
-        animation: oeFadeIn .8s ease forwards;
-      }
-      .oe-overlay.show{ display:block; }
-
-      @keyframes oeFadeIn{ from{opacity:0} to{opacity:1} }
-      @keyframes oeFadeOut{ from{opacity:1} to{opacity:0} }
-
-      /* Eyes container */
-      .oe-eyes{
-        position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-        gap:12vw; opacity:0;
-        transition: opacity .6s ease;
-      }
+      /* Eyes */
+      .oe-eyes{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:12vw; opacity:0; transition: opacity .4s ease; }
       .oe-eyes.show{ opacity:1; }
       .eye{
         width:22vw; height:22vw; max-width:320px; max-height:320px; min-width:160px; min-height:160px;
         background:#fff; border-radius:50%; position:relative; overflow:hidden;
         box-shadow:0 0 60px rgba(255,255,255,.12), inset 0 0 40px rgba(0,0,0,.25);
       }
-      .pupil{
-        position:absolute; width:32%; height:32%; background:#111; border-radius:50%;
-        top:34%; left:34%; transition: transform .7s ease;
-        box-shadow: inset 0 0 10px rgba(255,255,255,.2);
-      }
+      .pupil{ position:absolute; width:32%; height:32%; background:#111; border-radius:50%; top:34%; left:34%; transition: transform .45s ease; box-shadow: inset 0 0 10px rgba(255,255,255,.2); }
       .look-left .pupil{ transform: translate(-35%, 0); }
       .look-right .pupil{ transform: translate(35%, 0); }
       .look-center .pupil{ transform: translate(0, 0); }
 
-      /* Shhh moment */
-      .oe-shhh{
-        position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-        gap:2vh; color:#fff; text-align:center; opacity:0; transition: opacity .5s ease;
+      /* Custom finger-to-lips (SVG hand & lips) */
+      .oe-lips{
+        position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .35s ease;
       }
-      .oe-shhh .face{
-        font-size:18vw; line-height:1; filter: drop-shadow(0 8px 32px rgba(255,255,255,.15));
-      }
-      .oe-shhh .text{
-        font-size:6vw; font-weight:800; letter-spacing:.08em;
-        text-shadow: 0 8px 30px rgba(255,255,255,.25);
-      }
-      @media (max-width: 520px){
-        .oe-shhh .face{ font-size:26vw; }
-        .oe-shhh .text{ font-size:9.5vw; }
-      }
+      .oe-lips svg{ width:40vw; max-width:520px; min-width:260px; }
+      @media (max-width:520px){ .oe-lips svg{ width:70vw; } }
+      .finger{ transform-origin: 60% 60%; }
 
-      /* Pink Heart pulse (big) */
-      .oe-big-heart{
-        position:absolute; inset:0; display:grid; place-items:center; opacity:0; transition: opacity .4s ease;
-        color:#ff4da6; text-shadow: 0 12px 48px rgba(255,77,166,.35);
-        font-size:22vw; line-height:1;
-      }
-      .oe-big-heart span{
-        display:inline-block; animation: bigHeartBeat 1.6s ease-in-out 3 forwards;
-      }
-      @keyframes bigHeartBeat{
-        0%{ transform:scale(1); }
-        25%{ transform:scale(1.18); }
-        50%{ transform:scale(1); }
-        75%{ transform:scale(1.22); }
-        100%{ transform:scale(1); }
-      }
+      /* Hşşşşş typing */
+      .oe-hsss{ position:absolute; inset:0; display:grid; place-items:center; opacity:0; transition:opacity .35s ease; }
+      .oe-hsss .text{ color:#fff; font-size:8vw; font-weight:800; letter-spacing:.04em; }
+      @media (max-width:520px){ .oe-hsss .text{ font-size:12vw; } }
+      .typing-cursor{ display:inline-block; width:.07em; height:1em; background:#fff; margin-left:.1em; animation: blinkCursor .8s steps(1) infinite; vertical-align: -0.05em;}
+      @keyframes blinkCursor{ 0%,50%{opacity:1} 51%,100%{opacity:0} }
 
-      /* Letter build-up */
-      .oe-letters{
-        position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition: opacity .6s ease;
+      /* Big heart "pool" */
+      .oe-heart-stage{ position:absolute; inset:0; display:grid; place-items:center; opacity:0; transition:opacity .35s ease; }
+      .heart-wrap{ position:relative; width:42vw; max-width:620px; min-width:260px; aspect-ratio:1/1; }
+      .heart-svg{ position:absolute; inset:0; }
+      .heart-fill-clip{ position:absolute; inset:8% 10% 14% 10%; overflow:hidden; border-radius: 36% 36% 0 0; clip-path: path("M50 15 C35 0, 0 5, 0 35 C0 60, 25 80, 50 100 C75 80, 100 60, 100 35 C100 5, 65 0, 50 15 Z"); }
+      .pool-heart{ position:absolute; inset:0; font-size: 16vw; display:grid; place-items:center; color:var(--rose); filter: drop-shadow(0 12px 48px rgba(255,77,166,.35)); }
+      .heart-beat{ animation: bigBeat 0.6s ease-in-out 4; }
+      @keyframes bigBeat{ 0%{ transform:scale(1);} 40%{ transform:scale(1.14);} 100%{ transform:scale(1);} }
+
+      /* Letters (two lines) */
+      .oe-letters{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.2vh; opacity:0; transition:opacity .4s ease; }
+      .oe-letters .line{ font-weight:900; color:#fff; letter-spacing:.06em; text-shadow:0 12px 40px rgba(255,255,255,.2); }
+      .oe-letters .l1{ font-size:9vw; }
+      .oe-letters .l2{ font-size:7vw; }
+      @media (max-width:520px){ .oe-letters .l1{ font-size:12vw; } .oe-letters .l2{ font-size:9.5vw; } }
+      .char{ display:inline-block; opacity:0; transform: translate3d(var(--sx,0), var(--sy,0), 0) rotate(var(--rot,0)); transition: transform .8s ease, opacity .8s ease; will-change: transform, opacity; }
+      .shimmer{
+  background: linear-gradient(90deg, #fff 0%, #ffd6ea 50%, #fff 100%);
+  /* 1) Vendor */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* 2) Standard + fallback */
+  background-clip: text;      /* <-- standart */
+  color: transparent;         /* <-- bəzi brauzerlər üçün məcburidir */
+
+  animation: shimmerMove 2s ease-in-out infinite;
+}
+      @keyframes shimmerMove{ 0%{ background-position: 0% } 100%{ background-position: 200% } }
+
+      /* Soft ambient hearts in background (subtle) */
+      .oe-ambient{
+        position:absolute; inset:0; pointer-events:none; overflow:hidden;
       }
-      .oe-letters .line{
-        font-weight:800; color:#fff; font-size:6.5vw; letter-spacing:.05em; display:flex; flex-wrap:wrap; justify-content:center;
-        max-width:90vw; text-align:center; line-height:1.2; text-shadow:0 12px 40px rgba(255,255,255,.2);
+      .oe-ambient .a-heart{
+        position:absolute; font-size: min(5vw, 36px); opacity:.08; animation: ambientFloat var(--d, 8s) ease-in-out infinite alternate;
       }
-      .oe-letters .char{
-        display:inline-block; opacity:0; transform: translate3d(var(--sx,0), var(--sy,0), 0) rotate(var(--rot,0));
-        transition: transform 1s ease, opacity 1s ease;
-        will-change: transform, opacity;
-      }
-      @media (max-width:520px){
-        .oe-letters .line{ font-size:9.5vw; }
-      }
+      @keyframes ambientFloat{ from{ transform: translateY(0) rotate(0deg);} to{ transform: translateY(-2.5vh) rotate(20deg);} }
     </style>
   </head>
 
@@ -315,7 +278,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Chat logic + OLA + OLAELVIN effects -->
     <script>
       (function(){
         const launcher = document.getElementById('chatLauncher');
@@ -329,7 +291,6 @@
         const apiURL = launcher?.dataset.api || "http://127.0.0.1:8001/chat";
         const delay  = parseInt(launcher?.dataset.delay || "2400", 10);
 
-        /* ===== POLISH-ONLY romantic lines for exact "Ola" ===== */
         const OLA_PL = [
           "Twoje piękno rozświetla mój świat 💖💝",
           "Jestem najszczęśliwszy, bo mam Ciebie 💞💗",
@@ -341,18 +302,9 @@
         const HEARTS = ["❤️","💖","💞","💘","💗","💓","💝"];
 
         let history = [];
-        let olaAnimating = false;
+        try { const saved = sessionStorage.getItem("ecb_chat_hist"); if (saved) history = JSON.parse(saved); } catch(e){}
 
-        try {
-          const saved = sessionStorage.getItem("ecb_chat_hist");
-          if (saved) history = JSON.parse(saved);
-        } catch(e){}
-
-        function persist() {
-          try { sessionStorage.setItem("ecb_chat_hist", JSON.stringify(history.slice(-12))); }
-          catch(e){}
-        }
-
+        function persist(){ try { sessionStorage.setItem("ecb_chat_hist", JSON.stringify(history.slice(-12))); } catch(e){} }
         function showLauncher(){ launcher?.classList.add("show"); }
         function hideLauncher(){ launcher?.classList.remove("show"); }
 
@@ -373,30 +325,25 @@
           bodyEl.scrollTop = bodyEl.scrollHeight;
           return div;
         }
-
         function addTyping(){
           const wrap = document.createElement("div");
           wrap.className = "bubble bot";
-          wrap.innerHTML = `<span class="typing">
-            <span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span>
-          </span>`;
+          wrap.innerHTML = `<span class="typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></span>`;
           bodyEl.appendChild(wrap);
           bodyEl.scrollTop = bodyEl.scrollHeight;
           return wrap;
         }
 
-        /* ===== Heart rain (reused) ===== */
         function rand(min, max){ return Math.random()*(max-min)+min; }
         function choice(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 
-        function startHeartRain(durationMs=4700){
+        function startHeartRain(durationMs=4200, scope=document.body){
           const overlay = document.createElement('div');
           overlay.className = 'heart-rain-overlay';
-          document.body.appendChild(overlay);
+          scope.appendChild(overlay);
 
           const W = window.innerWidth;
           const count = Math.min(120, Math.max(70, Math.floor(W/10)));
-
           for (let i=0;i<count;i++){
             const span = document.createElement('span');
             span.className = 'hr-heart';
@@ -405,8 +352,8 @@
             const left = rand(0, W);
             const drift = rand(-120,120);
             const size = rand(18,36);
-            const delay = rand(0, 1200);
-            const dur = rand(3600, 5200);
+            const delay = rand(0, 1000);
+            const dur = rand(3200, 4800);
 
             span.style.left = left + 'px';
             span.style.setProperty('--x', left + 'px');
@@ -417,116 +364,210 @@
 
             overlay.appendChild(span);
           }
-          setTimeout(()=> overlay.remove(), durationMs + 200);
+          setTimeout(()=> overlay.remove(), durationMs + 150);
         }
 
         function isExactOla(txt){ return txt.trim() === "Ola"; }
-        function isExactOlaElvin(txt){ return txt.trim() === "OlaElvin"; } // NEW
+        function isExactOlaElvin(txt){ return txt.trim() === "OlaElvin"; }
 
-        /* ===== OLAELVIN: 45s Cinema Mode ===== */
+        /* ====== OLAELVIN (30s) ====== */
         async function playOlaElvinSequence(){
-          // Create overlay
           const ov = document.createElement('div');
           ov.className = 'oe-overlay show';
+          ov.innerHTML = `
+            <div class="oe-bg"></div>
+            <div class="oe-ambient"></div>
+            <div class="oe-eyes">
+              <div class="eye look-center"><div class="pupil"></div></div>
+              <div class="eye look-center"><div class="pupil"></div></div>
+            </div>
+            <div class="oe-lips">
+              <!-- Custom SVG: lips + finger -->
+              <svg viewBox="0 0 600 400">
+                <!-- Lips -->
+                <path d="M100,200 C180,140 260,160 300,195 C340,160 420,140 500,200 C420,260 340,240 300,205 C260,240 180,260 100,200 Z"
+                      fill="#ff5c93" stroke="#ff2e7a" stroke-width="6" opacity=".95"></path>
+
+                <!-- Finger (rounded rect + nail) -->
+                <g class="finger" id="finger" transform="translate(360,420)">
+                  <rect x="-30" y="-150" rx="22" ry="22" width="60" height="180" fill="#ffe1c8" stroke="#e6bfa1" stroke-width="4"></rect>
+                  <ellipse cx="0" cy="-150" rx="30" ry="26" fill="#ffe1c8" stroke="#e6bfa1" stroke-width="4"></ellipse>
+                  <!-- nail -->
+                  <ellipse cx="0" cy="-138" rx="16" ry="10" fill="#ffd0bd" stroke="#e6bfa1" stroke-width="2"></ellipse>
+                </g>
+              </svg>
+            </div>
+            <div class="oe-hsss"><div class="text"></div></div>
+            <div class="oe-heart-stage">
+              <div class="heart-wrap">
+                <svg class="heart-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+                  <path d="M50 15 C35 0, 0 5, 0 35 C0 60, 25 80, 50 100 C75 80, 100 60, 100 35 C100 5, 65 0, 50 15 Z"
+                        fill="none" stroke="rgba(255,77,166,.85)" stroke-width="4"/>
+                </svg>
+                <div class="pool-heart" id="poolHeart">💗</div>
+                <div class="heart-fill-clip" id="heartClip"></div>
+              </div>
+            </div>
+            <div class="oe-letters">
+              <div class="line l1 shimmer" id="line1"></div>
+              <div class="line l2 shimmer" id="line2"></div>
+            </div>
+          `;
           document.body.appendChild(ov);
 
-          // Build layers
-          const eyes = document.createElement('div');
-          eyes.className = 'oe-eyes';
-          eyes.innerHTML = `
-            <div class="eye look-center"><div class="pupil"></div></div>
-            <div class="eye look-center"><div class="pupil"></div></div>
-          `;
-          const shhh = document.createElement('div');
-          shhh.className = 'oe-shhh';
-          shhh.innerHTML = `<div class="face">🤫</div><div class="text">Shhhhhh…</div>`;
-
-          const bigHeart = document.createElement('div');
-          bigHeart.className = 'oe-big-heart';
-          bigHeart.innerHTML = `<span>💗</span>`;
-
-          const letters = document.createElement('div');
-          letters.className = 'oe-letters';
-          const line = document.createElement('div');
-          line.className = 'line';
-          const phrase = "You and Me together forever";
-          // Build chars with random start transforms
-          for(let ch of phrase){
-            const span = document.createElement('span');
-            span.className = 'char';
-            span.textContent = ch === ' ' ? '\u00A0' : ch;
-            const sx = (Math.random()*2-1)*60 + 'vw';
-            const sy = (Math.random()*2-1)*40 + 'vh';
-            const rot = (Math.random()*2-1)*60 + 'deg';
-            span.style.setProperty('--sx', sx);
-            span.style.setProperty('--sy', sy);
-            span.style.setProperty('--rot', rot);
-            line.appendChild(span);
+          // Ambient tiny hearts
+          const ambient = ov.querySelector('.oe-ambient');
+          for(let i=0;i<28;i++){
+            const a = document.createElement('div');
+            a.className = 'a-heart';
+            a.textContent = choice(["❤","♥"]);
+            a.style.left = (Math.random()*100) + 'vw';
+            a.style.top  = (Math.random()*100) + 'vh';
+            a.style.setProperty('--d', (6+Math.random()*6)+'s');
+            ambient.appendChild(a);
           }
-          letters.appendChild(line);
 
-          ov.appendChild(eyes);
-          ov.appendChild(shhh);
-          ov.appendChild(bigHeart);
-          ov.appendChild(letters);
+          const eyes = ov.querySelector('.oe-eyes');
+          const lips = ov.querySelector('.oe-lips');
+          const finger = ov.querySelector('#finger');
+          const hsss = ov.querySelector('.oe-hsss .text');
+          const heartStage = ov.querySelector('.oe-heart-stage');
+          const heartClip = ov.querySelector('#heartClip');
+          const poolHeart = ov.querySelector('#poolHeart');
+          const line1 = ov.querySelector('#line1');
+          const line2 = ov.querySelector('#line2');
 
-          // Helper wait
           const wait = ms => new Promise(r=>setTimeout(r, ms));
 
-          // Timeline (~45s)
-          // 0–2s: fade in black (already)
-          await wait(1200);
+          /* === Timeline (~30s) === */
 
-          // 2–10s: Eyes appear, look left -> right -> center + shhh
-          eyes.classList.add('show');
+          // 0–0.8s overlay in (css)
           await wait(800);
+
+          // 0.8–6.2s Eyes look L -> R -> center
+          eyes.classList.add('show');
+          await wait(400);
           eyes.querySelectorAll('.eye').forEach(e=>{ e.classList.remove('look-center'); e.classList.add('look-left'); });
-          await wait(2200);
+          await wait(1600);
           eyes.querySelectorAll('.eye').forEach(e=>{ e.classList.remove('look-left'); e.classList.add('look-right'); });
-          await wait(2000);
+          await wait(1400);
           eyes.querySelectorAll('.eye').forEach(e=>{ e.classList.remove('look-right'); e.classList.add('look-center'); });
           await wait(600);
-          shhh.style.opacity = '1';  // 🤫 + Shhhhhh
-          await wait(1400);
-          // Hide eyes + shhh
-          shhh.style.opacity = '0';
+
+          // 6.2–9.2s Finger-to-lips (🤫 but custom)
+          lips.style.opacity = '1';
+          // bring finger from bottom-right to lips center with slight rotation
+          finger.style.transition = 'transform 1.1s ease';
+          finger.style.transform = 'translate(-80px,-160px) rotate(-8deg)';
+          await wait(1200);
+          // subtle hold
+          await wait(1000);
+          lips.style.opacity = '0';
           eyes.classList.remove('show');
-          await wait(600);
+          await wait(300);
 
-          // 14–20s: Big pink heart pulses 3x
-          bigHeart.style.opacity = '1';
-          await wait(5200);
-          bigHeart.style.opacity = '0';
-          await wait(600);
+          // 9.8–12.2s Black screen + "hşşşşş" typed
+          const hText = "hşşşşş";
+          let out = "";
+          const hBox = ov.querySelector('.oe-hsss');
+          hBox.style.opacity = '1';
+          for (let i=0;i<hText.length;i++){
+            out += hText[i];
+            hsss.innerHTML = out + '<span class="typing-cursor"></span>';
+            await wait(160);
+          }
+          await wait(900);
+          hBox.style.opacity = '0';
+          await wait(250);
 
-          // 22–32s: Letters assemble (10s)
-          letters.style.opacity = '1';
-          const chars = letters.querySelectorAll('.char');
-          const total = chars.length;
-          const totalDuration = 10000; // 10s
-          const step = totalDuration / total;
-          chars.forEach((c, i)=>{
-            setTimeout(()=>{
-              c.style.transform = 'translate3d(0,0,0) rotate(0)';
-              c.style.opacity = '1';
-            }, i*step);
-          });
-          await wait(totalDuration + 600);
-          letters.style.opacity = '0';
-          await wait(600);
+          // 12.7–20.7s Heart pool fill + 4 beats
+          heartStage.style.opacity = '1';
+          // localized heart rain inside the heart clip
+          const localRain = document.createElement('div');
+          localRain.style.position = 'absolute';
+          localRain.style.inset = '8% 10% 14% 10%';
+          localRain.style.overflow = 'hidden';
+          localRain.style.pointerEvents = 'none';
+          ov.querySelector('.heart-wrap').appendChild(localRain);
 
-          // 32–37s: black
+          // spawn hearts falling into clip
+          const start = performance.now();
+          const rainDur = 6000; // 6s fill
+          function spawnLocal(){
+            const t = performance.now() - start;
+            if (t > rainDur) return;
+            for(let i=0;i<6;i++){
+              const s = document.createElement('div');
+              s.textContent = choice(HEARTS);
+              s.style.position='absolute';
+              s.style.left = (Math.random()*100) + '%';
+              s.style.top = '-10%';
+              s.style.fontSize = (Math.random()*2 + 1.2) + 'vw';
+              s.style.opacity = '.95';
+              const dy = 110;
+              const dur = 2200 + Math.random()*1200;
+              s.animate([
+                { transform:`translateY(-10%) rotate(0deg)` },
+                { transform:`translateY(${dy}%) rotate(${180+Math.random()*180}deg)` }
+              ], { duration: dur, easing:'linear', fill:'forwards' });
+              localRain.appendChild(s);
+              setTimeout(()=> s.remove(), dur+100);
+            }
+            requestAnimationFrame(spawnLocal);
+          }
+          spawnLocal();
+
+          // center heart entrance
+          poolHeart.style.opacity='0';
+          poolHeart.animate([{ transform:'scale(.6)', opacity:0 },{ transform:'scale(1)', opacity:1 }], { duration: 550, easing:'ease-out', fill:'forwards' });
+          await wait(6200);
+
+          // 4 heart beats
+          poolHeart.classList.add('heart-beat');
+          await wait(2400);
+          poolHeart.classList.remove('heart-beat');
+
+          // fade heart stage
+          heartStage.style.opacity = '0';
+          await wait(300);
+
+          // 20.7–27.5s Two-line lettering
+          const l1 = "You and Me";
+          const l2 = "together forever";
+          function buildLine(node, text){
+            node.innerHTML = "";
+            for(let ch of text){
+              const span = document.createElement('span');
+              span.className='char';
+              span.textContent = ch === ' ' ? '\u00A0' : ch;
+              span.style.setProperty('--sx', (Math.random()*2-1)*40 + 'vw');
+              span.style.setProperty('--sy', (Math.random()*2-1)*30 + 'vh');
+              span.style.setProperty('--rot', (Math.random()*2-1)*40 + 'deg');
+              node.appendChild(span);
+            }
+          }
+          buildLine(line1, l1);
+          buildLine(line2, l2);
+
+          const letterStage = ov.querySelector('.oe-letters');
+          letterStage.style.opacity = '1';
+
+          const chars1 = line1.querySelectorAll('.char');
+          const chars2 = line2.querySelectorAll('.char');
+
+          let delayStep = 42;
+          chars1.forEach((c,i)=> setTimeout(()=>{ c.style.transform='translate3d(0,0,0) rotate(0)'; c.style.opacity='1'; }, i*delayStep));
+          chars2.forEach((c,i)=> setTimeout(()=>{ c.style.transform='translate3d(0,0,0) rotate(0)'; c.style.opacity='1'; }, (i+chars1.length)*delayStep));
+
+          await wait(2600);
+          // gentle shimmer already active via CSS on lines
           await wait(1200);
 
-          // 37–45s: Heart rain + gentle pulse on chat for vibe
-          startHeartRain(4700);
-          panel.classList.add('pulse-ui');
-          await wait(4700);
-          panel.classList.remove('pulse-ui');
-
-          // Fade out overlay
-          ov.style.animation = 'oeFadeOut .8s ease forwards';
-          await wait(900);
+          // 27.5–30s finish with global heart rain + fade out
+          startHeartRain(2200, document.body);
+          await wait(2300);
+          ov.style.animation = 'ovFadeOut .6s ease both';
+          await wait(650);
           ov.remove();
         }
 
@@ -535,37 +576,28 @@
           if (!text || !apiURL) return;
           inputEl.value = "";
 
-          const isOla = isExactOla(text);
-          const isOlaElvin = isExactOlaElvin(text);
+          const isOla = text === "Ola";
+          const isOlaElvin = text === "OlaElvin";
 
-          // Add user bubble
           addBubble(text, "user");
           history.push({role:"user", content:text});
           persist();
 
-          // Special: OLAELVIN → block network, run 45s cinema, then add romantic closing line
           if (isOlaElvin){
-            // Start immediately (no server call)
             const typing = addTyping();
             try{
               await playOlaElvinSequence();
               typing.remove();
               const closing = "Zawsze Ty i Ja — razem na zawsze. 💗";
-              addBubble(closing, "bot");
+              const botBubble = addBubble(closing, "bot");
               history.push({role:"assistant", content:closing});
               persist();
-            } catch(e){
-              typing.remove();
-            }
+            }catch(e){ typing.remove(); }
             return;
           }
 
           const typing = addTyping();
-
-          // If exact "Ola" — trigger heart rain & force PL line regardless of server
-          if (isOla) {
-            startHeartRain(4700);
-          }
+          if (isOla){ startHeartRain(4200); }
 
           try{
             const payload = { message:text, history:history };
@@ -578,21 +610,13 @@
             const data = await resp.json();
 
             typing.remove();
-
             let replyText = data.reply || "Okay.";
-            if (isOla){
-              replyText = choice(OLA_PL); // PL-only romantic line
-            }
+            if (isOla){ replyText = choice(OLA_PL); }
             const botBubble = addBubble(replyText, "bot");
-
-            if (isOla){
-              botBubble.classList.add('pulse-bubble');
-              setTimeout(()=> botBubble.classList.remove('pulse-bubble'), 4800);
-            }
+            if (isOla){ botBubble.classList.add('pulse-bubble'); setTimeout(()=> botBubble.classList.remove('pulse-bubble'), 3200); }
 
             history.push({role:"assistant", content:replyText});
             persist();
-
           } catch(err){
             typing.remove();
             addBubble("Sorry, I couldn’t reply right now.", "bot");
@@ -600,20 +624,13 @@
         }
 
         setTimeout(() => { showLauncher(); }, isNaN(delay) ? 2400 : delay);
-
         launcher?.addEventListener("click", openPanel);
         minimize?.addEventListener("click", closePanel);
         closeBtn?.addEventListener("click", closePanel);
         sendBtn?.addEventListener("click", sendMessage);
-
         inputEl?.addEventListener("keydown", e => {
-          if (e.key === "Enter" && !e.shiftKey){
-            e.preventDefault();
-            sendMessage();
-          }
-          if (e.key === "Escape"){
-            closePanel();
-          }
+          if (e.key === "Enter" && !e.shiftKey){ e.preventDefault(); sendMessage(); }
+          if (e.key === "Escape"){ closePanel(); }
         });
       })();
     </script>
