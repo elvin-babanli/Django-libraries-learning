@@ -147,9 +147,20 @@
       /* Big heart (no pulse) + sparks around */
       .oe-heart{ position:absolute; inset:0; display:grid; place-items:center; opacity:0; transition:opacity .35s ease; }
       .heartWrap{ position:relative; width:44vw; max-width:640px; min-width:260px; aspect-ratio:1/1; }
-      .heartSvg{ position:absolute; inset:0; }
-      .heartSvg .outer{ filter: drop-shadow(0 12px 48px rgba(255,77,166,.35)); transform-origin:50% 60%; }
-      .heartSvg .inner{ transform-origin:50% 60%; }
+      .heartSvg{
+  position:absolute; inset:0;
+  overflow: visible;            /* raster clip izini gizlədir */
+}
+.heartSvg .outer{
+  /* drop-shadow-u ya tam sil, ya da çox zəif saxla */
+  filter: drop-shadow(0 6px 20px rgba(255,77,166,.18));
+  transform-origin:50% 60%;
+  opacity:.92;                  /* ümumi parlaqlığı yumşaldır */
+}
+.heartSvg .inner{
+  transform-origin:50% 60%;
+  opacity:.94;                  /* iç parlaqlığı da bir az azaldır */
+}
       .oe-heart-spark{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
       .mini-heart{
         position:absolute; font-size:18px; color:#ff4da6; filter: drop-shadow(0 6px 14px rgba(255,77,166,.4));
@@ -399,8 +410,8 @@
                       <stop offset="100%" stop-color="var(--roseDeep)"/>
                     </radialGradient>
                     <radialGradient id="gradInner" cx="50%" cy="55%" r="50%">
-                      <stop offset="0%"  stop-color="#ffd2ea"/>
-                      <stop offset="60%" stop-color="var(--rose2)"/>
+                      <stop offset="0%"  stop-color="#ffc2e3"/>
+                      <stop offset="60%" stop-color="var(--rose3)"/>
                       <stop offset="100%" stop-color="var(--rose)"/>
                     </radialGradient>
                   </defs>
@@ -450,7 +461,7 @@
           hsssBox.style.opacity = '1';
           const t = "Hssss";
           let out = "";
-          const totalTyping = 4000, perChar = Math.floor(totalTyping / t.length);
+          const totalTyping = 2500, perChar = Math.floor(totalTyping / t.length);
           for (let i=0;i<t.length;i++){
             out += t[i];
             hsss.innerHTML = out + '<span class="typing-cursor"></span>';
