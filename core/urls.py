@@ -49,6 +49,6 @@ urlpatterns = [
     path('cheap-flight-finder/', cheap_flight_finder_view, name="cheap_flight_finder"),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     path('numpy/',get_numpy, name='numpy'),
-    path('numpy/',get_matplotlib, name='matplotlib'),
+    path('matplotlib/',get_matplotlib, name='matplotlib'),
 ]
 
