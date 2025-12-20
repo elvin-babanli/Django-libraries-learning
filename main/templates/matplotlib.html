@@ -1,0 +1,707 @@
+{% extends "base.html" %}
+
+{% block title %}Matplotlib{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Layout */
+  .mpl-sidebar { border-radius: 1rem; overflow: hidden; background: #fff; }
+  .mpl-sidebar .list-group-item { border: none; border-bottom: 1px solid #e5e7eb; font-size: 0.92rem; }
+  .mpl-sidebar .list-group-item.active { background: linear-gradient(135deg, #0d6efd, #a855f7); border-color: transparent; }
+  .mpl-sidebar .list-group-item:last-child { border-bottom: none; }
+
+  .mpl-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 1rem; padding: 1rem 1.1rem; }
+  .mpl-muted { color: #6b7280; }
+  .mpl-kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.85rem; }
+
+  /* Accordion */
+  .accordion-item { border-radius: 1rem; overflow: hidden; border: 1px solid #e5e7eb; }
+  .accordion-item + .accordion-item { margin-top: 0.85rem; }
+  .accordion-button { font-weight: 600; }
+  .accordion-button:not(.collapsed) { background: #eef2ff; color: #111827; }
+  .accordion-body { background: #ffffff; }
+
+  /* Code window */
+  .code-window {
+    border-radius: 0.95rem;
+    overflow: hidden;
+    background: #020617;
+    color: #e5e7eb;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+  }
+  .code-window.light { background: #0b1220; }
+  .code-window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.95rem;
+    background: linear-gradient(135deg, #111827, #0f172a);
+    font-size: 0.78rem;
+  }
+  .code-window-title { color: #cbd5e1; }
+  .code-window-path { color: #94a3b8; font-size: 0.72rem; }
+  .code-dots { display: inline-flex; gap: 0.3rem; }
+  .code-dot { width: 9px; height: 9px; border-radius: 999px; }
+  .code-dot.red { background: #f87171; }
+  .code-dot.yellow { background: #facc15; }
+  .code-dot.green { background: #4ade80; }
+  .code-window-body { padding: 0.8rem 1rem; }
+  .code-window pre { margin: 0; background: transparent; padding: 0; white-space: pre; }
+  .code-window code { color: #e5e7eb; font-size: 0.86rem; }
+
+  /* Section labels + notes */
+  .section-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #64748b; }
+  .note-card { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 0.95rem; padding: 0.95rem 1rem; }
+  .badge-soft { background: #eef2ff; color: #3730a3; border: 1px solid #e0e7ff; }
+
+  /* Small helpers */
+  .anchor-pad { scroll-margin-top: 95px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Sidebar -->
+  <div class="col-lg-3">
+    <div class="list-group shadow-sm sticky-top mpl-sidebar" style="top: 80px;">
+      <div class="list-group-item active fw-semibold">Matplotlib</div>
+      <a class="list-group-item list-group-item-action" href="#quick" >Quick start</a>
+      <a class="list-group-item list-group-item-action" href="#setup" >0) Setup</a>
+      <a class="list-group-item list-group-item-action" href="#csv"   >1) labels.csv</a>
+      <a class="list-group-item list-group-item-action" href="#paths" >2) Paths & checks</a>
+      <a class="list-group-item list-group-item-action" href="#plots" >3) Plots</a>
+      <a class="list-group-item list-group-item-action" href="#lists" >4) Lists & filtering</a>
+      <a class="list-group-item list-group-item-action" href="#imgs"  >5) Show images</a>
+      <a class="list-group-item list-group-item-action" href="#sel"   >6) Selected breeds</a>
+      <a class="list-group-item list-group-item-action" href="#cheat" >Cheat sheet</a>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="col-lg-9">
+
+    <!-- Quick start -->
+    <div id="quick" class="mpl-card anchor-pad mb-4">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <span class="badge badge-soft rounded-pill px-3 py-2">Beginner notes</span>
+        <span class="badge text-bg-dark rounded-pill px-3 py-2">Google Colab</span>
+        <span class="badge text-bg-secondary rounded-pill px-3 py-2">dog-breed-identification</span>
+      </div>
+
+      <h2 class="mt-3 mb-2">Matplotlib practice (dataset: dog-breed-identification)</h2>
+      <p class="mpl-muted mb-3">
+        Format: <strong>Code</strong> → <strong>Output</strong> → <strong>İzah</strong>.
+        Kod İngiliscədir, izahlar Azərbaycan dilindədir.
+      </p>
+
+      <div class="note-card">
+        <div class="section-label mb-2">Bu yollara uyğun yazılıb</div>
+        <ul class="mb-0">
+          <li><span class="mpl-kbd">/content/drive/MyDrive/dog vision/labels.csv</span></li>
+          <li><span class="mpl-kbd">/content/drive/MyDrive/dog vision/train</span></li>
+          <li><span class="mpl-kbd">/content/drive/MyDrive/dog vision/dog-breed-identification.zip</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="accordion" id="mplAccordion">
+
+      <!-- 0) Setup -->
+      <div class="accordion-item anchor-pad" id="setup">
+        <h2 class="accordion-header">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#c0" aria-expanded="true">
+            0) Setup (Drive + unzip + yol yoxlaması)
+          </button>
+        </h2>
+        <div id="c0" class="accordion-collapse collapse show" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="section-label mb-2">A) Drive mount</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">setup_drive.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>from google.colab import drive
+drive.mount("/content/drive")</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> Drive qoşulmasa, <span class="mpl-kbd">MyDrive</span> içindəki dataset fayllarına giriş olmaz.
+            </div>
+
+            <div class="section-label mb-2">B) Unzip (terminal cell)</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Terminal</span>
+                </div>
+                <span class="code-window-path">$ /content</span>
+              </div>
+              <div class="code-window-body"><pre><code>!unzip "/content/drive/MyDrive/dog vision/dog-breed-identification.zip" -d "/content/drive/MyDrive/dog vision"</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> Zip açıldıqdan sonra <span class="mpl-kbd">train/</span> və <span class="mpl-kbd">labels.csv</span> görünməlidir.
+            </div>
+
+            <div class="section-label mb-2">C) Yol yoxla</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">paths_check.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import os
+
+base_dir = "/content/drive/MyDrive/dog vision"
+train_dir = os.path.join(base_dir, "train")
+
+print("Base exists:", os.path.exists(base_dir))
+print("Train exists:", os.path.exists(train_dir))</code></pre></div>
+            </div>
+
+            <div class="code-window light">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Output (example)</span>
+                </div>
+                <span class="code-window-path">console</span>
+              </div>
+              <div class="code-window-body"><pre><code>Base exists: True
+Train exists: True</code></pre></div>
+            </div>
+
+            <div class="note-card mt-3">
+              <strong>İzah:</strong> Burada <span class="mpl-kbd">False</span> görsən, yol səhvdir — əvvəl onu düzəlt, sonra davam et.
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 1) labels.csv -->
+      <div class="accordion-item anchor-pad" id="csv">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c1">
+            1) labels.csv (oxu + ilkin baxış)
+          </button>
+        </h2>
+        <div id="c1" class="accordion-collapse collapse" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="section-label mb-2">A) CSV oxu + ilk 5 sətir</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">read_csv.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import pandas as pd
+
+labels_csv = pd.read_csv("/content/drive/MyDrive/dog vision/labels.csv")
+labels_csv.head()</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> Burada əsas iki sütun var:
+              <span class="mpl-kbd">id</span> (şəkil adı) və <span class="mpl-kbd">breed</span> (cins).
+            </div>
+
+            <div class="section-label mb-2">B) info</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">df_info.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>labels_csv.info()</code></pre></div>
+            </div>
+
+            <div class="note-card">
+              <strong>İzah:</strong> <span class="mpl-kbd">info()</span> — sətir sayı, sütun tipləri, boş dəyər var/yox.
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) paths & checks -->
+      <div class="accordion-item anchor-pad" id="paths">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
+            2) Paths & checks (filenames list + say yoxlaması)
+          </button>
+        </h2>
+        <div id="c2" class="accordion-collapse collapse" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="section-label mb-2">A) filenames list</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">filenames.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import os
+
+base_dir = "/content/drive/MyDrive/dog vision"
+train_dir = os.path.join(base_dir, "train")
+
+filenames = [os.path.join(train_dir, f"{img_id}.jpg") for img_id in labels_csv["id"]]
+
+print("Total filenames:", len(filenames))
+print("Example:", filenames[0])</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> Burada məqsəd: CSV-dəki bütün <span class="mpl-kbd">id</span>-lər üçün tam şəkil yolunu hazırlamaq.
+            </div>
+
+            <div class="section-label mb-2">B) train şəkil sayı = CSV sətir sayı?</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">count_check.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import os
+
+train_images_count = len([f for f in os.listdir(train_dir) if f.endswith(".jpg")])
+csv_count = len(labels_csv)
+
+print("Train images:", train_images_count)
+print("CSV rows:", csv_count)
+print("Equal?", train_images_count == csv_count)</code></pre></div>
+            </div>
+
+            <div class="note-card">
+              <strong>İzah:</strong> Əgər <span class="mpl-kbd">Equal? False</span> çıxsa, ya train qovluğu tam deyil, ya da yol səhvdir.
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 3) plots -->
+      <div class="accordion-item anchor-pad" id="plots">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3">
+            3) Plots (bar / hist / pie)
+          </button>
+        </h2>
+        <div id="c3" class="accordion-collapse collapse" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="section-label mb-2">A) Top 20 — bar chart</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">plot_bar.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import matplotlib.pyplot as plt
+
+breed_counts = labels_csv["breed"].value_counts()
+
+top_n = 20
+breed_counts.head(top_n).plot(kind="bar", figsize=(14, 5))
+
+plt.title(f"Top {top_n} Dog Breeds by Count")
+plt.xlabel("Breed")
+plt.ylabel("Count")
+plt.xticks(rotation=45, ha="right")
+plt.show()</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> <span class="mpl-kbd">value_counts()</span> — hər breed-dən neçə dəfə var (sayır).
+              <span class="mpl-kbd">head(20)</span> — yalnız ilk 20-ni göstərir.
+            </div>
+
+            <div class="section-label mb-2">B) Histogram — breed başına şəkil sayı paylanması</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">plot_hist.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import matplotlib.pyplot as plt
+
+breed_counts = labels_csv["breed"].value_counts()
+
+plt.figure(figsize=(10, 5))
+plt.hist(breed_counts, bins=20)
+
+plt.title("Distribution: images per breed")
+plt.xlabel("Images per breed")
+plt.ylabel("Number of breeds")
+plt.show()</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> Histogram “az şəkilli breed-lər çoxdur, yoxsa az?” kimi balans hissini verir.
+            </div>
+
+            <div class="section-label mb-2">C) Pie — yalnız top 10</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">plot_pie.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import matplotlib.pyplot as plt
+
+breed_counts = labels_csv["breed"].value_counts()
+
+top_n = 10
+top_breeds = breed_counts.head(top_n)
+
+plt.figure(figsize=(8, 8))
+plt.pie(top_breeds, labels=top_breeds.index, autopct="%1.1f%%", startangle=90)
+plt.title(f"Top {top_n} Breeds Share")
+plt.show()</code></pre></div>
+            </div>
+
+            <div class="note-card">
+              <strong>İzah:</strong> Pie chart çox kateqoriya ilə qarışır — ona görə top 10 idealdır.
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 4) Lists & filtering -->
+      <div class="accordion-item anchor-pad" id="lists">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c4">
+            4) Lists & filtering (listə salmaq, seçmək, çap etmək)
+          </button>
+        </h2>
+        <div id="c4" class="accordion-collapse collapse" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="section-label mb-2">A) Breed sütununu list et</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">list_basic.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>breeds_list = labels_csv["breed"].tolist()
+
+print("Total labels:", len(breeds_list))
+print("First 10:", breeds_list[:10])</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> <span class="mpl-kbd">tolist()</span> pandas sütununu Python list edir.
+              <span class="mpl-kbd">[:10]</span> ilk 10 element deməkdir.
+            </div>
+
+            <div class="section-label mb-2">B) Unikal breed-lər (təkrarsız)</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">list_unique.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>unique_breeds = labels_csv["breed"].unique().tolist()
+
+print("Unique breed count:", len(unique_breeds))
+print("First 20 unique:", unique_breeds[:20])</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> <span class="mpl-kbd">unique()</span> — təkrarsız dəyərləri verir.
+            </div>
+
+            <div class="section-label mb-2">C) Seçilmiş breed-lər üçün filtr (isin)</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">filter_isin.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>selected_breeds = ["pug", "husky", "beagle"]
+
+filtered_df = labels_csv[labels_csv["breed"].isin(selected_breeds)]
+
+print("Selected:", selected_breeds)
+print("Filtered rows:", len(filtered_df))
+filtered_df.head()</code></pre></div>
+            </div>
+
+            <div class="note-card">
+              <strong>İzah:</strong> <span class="mpl-kbd">isin(list)</span> — “bu siyahının içində var?” filtridir.
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 5) Show images -->
+      <div class="accordion-item anchor-pad" id="imgs">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c5">
+            5) Show images (ID / random / 3x3 grid)
+          </button>
+        </h2>
+        <div id="c5" class="accordion-collapse collapse" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="section-label mb-2">A) ID ilə şəkil göstər + breed</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">image_by_id.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import os
+from IPython.display import Image, display
+
+base_dir = "/content/drive/MyDrive/dog vision"
+train_dir = os.path.join(base_dir, "train")
+
+img_id = labels_csv.loc[0, "id"]
+breed = labels_csv.loc[0, "breed"]
+
+img_path = os.path.join(train_dir, img_id + ".jpg")
+
+print("ID:", img_id)
+print("Breed:", breed)
+display(Image(filename=img_path))</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> <span class="mpl-kbd">loc[0, "id"]</span> — 0-cı sətirdəki id.
+              Şəkil yolu isə <span class="mpl-kbd">train/id.jpg</span>.
+            </div>
+
+            <div class="section-label mb-2">B) Random 1 şəkil</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">image_random.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import os
+import random
+from IPython.display import Image, display
+
+all_images = [f for f in os.listdir(train_dir) if f.endswith(".jpg")]
+random_img = random.choice(all_images)
+
+print("Selected:", random_img)
+display(Image(filename=os.path.join(train_dir, random_img)))</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> <span class="mpl-kbd">os.listdir()</span> qovluğu list edir,
+              <span class="mpl-kbd">random.choice()</span> listdən 1 random seçir.
+            </div>
+
+            <div class="section-label mb-2">C) 3x3 grid — 9 random şəkil</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">image_grid.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import os
+import random
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+all_images = [f for f in os.listdir(train_dir) if f.endswith(".jpg")]
+sample_images = random.sample(all_images, 9)
+
+plt.figure(figsize=(10, 10))
+
+for i, img_name in enumerate(sample_images):
+    img_path = os.path.join(train_dir, img_name)
+    img = mpimg.imread(img_path)
+
+    plt.subplot(3, 3, i + 1)
+    plt.imshow(img)
+    plt.axis("off")
+    plt.title(img_name[:10])
+
+plt.suptitle("Random 3x3 Dog Images", fontsize=16)
+plt.show()</code></pre></div>
+            </div>
+
+            <div class="note-card">
+              <strong>İzah:</strong> <span class="mpl-kbd">subplot(3,3,i+1)</span> — 3x3 paneldə i+1-ci yer.
+              <span class="mpl-kbd">axis("off")</span> oxları gizlədir.
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- 6) Selected breeds -->
+      <div class="accordion-item anchor-pad" id="sel">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c6">
+            6) Selected breeds (yalnız seçilən cinslər)
+          </button>
+        </h2>
+        <div id="c6" class="accordion-collapse collapse" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="section-label mb-2">A) Seçilmiş breed-lərin sayını göstər (bar)</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">selected_counts.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import matplotlib.pyplot as plt
+
+selected_breeds = ["pug", "husky", "beagle", "chihuahua"]
+
+counts = labels_csv[labels_csv["breed"].isin(selected_breeds)]["breed"].value_counts()
+
+counts.plot(kind="bar", figsize=(8, 4))
+plt.title("Counts for selected breeds")
+plt.xlabel("Breed")
+plt.ylabel("Count")
+plt.xticks(rotation=30, ha="right")
+plt.show()</code></pre></div>
+            </div>
+
+            <div class="note-card mb-4">
+              <strong>İzah:</strong> Məntiq: filtr (<span class="mpl-kbd">isin</span>) → say (<span class="mpl-kbd">value_counts</span>) → plot.
+            </div>
+
+            <div class="section-label mb-2">B) Bir breed seç → 6 şəkil göstər (2x3)</div>
+            <div class="code-window mb-3">
+              <div class="code-window-header">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="code-dots"><span class="code-dot red"></span><span class="code-dot yellow"></span><span class="code-dot green"></span></span>
+                  <span class="code-window-title">Python</span>
+                </div>
+                <span class="code-window-path">selected_images.py</span>
+              </div>
+              <div class="code-window-body"><pre><code>import os
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+base_dir = "/content/drive/MyDrive/dog vision"
+train_dir = os.path.join(base_dir, "train")
+
+target_breed = "pug"
+
+subset = labels_csv[labels_csv["breed"] == target_breed]
+n = min(6, len(subset))
+sample_rows = subset.sample(n=n, random_state=42)
+
+plt.figure(figsize=(12, 6))
+
+for i, row in enumerate(sample_rows.itertuples(index=False)):
+    img_id = row.id
+    img_path = os.path.join(train_dir, img_id + ".jpg")
+    img = mpimg.imread(img_path)
+
+    plt.subplot(2, 3, i + 1)
+    plt.imshow(img)
+    plt.axis("off")
+    plt.title(target_breed)
+
+plt.suptitle(f"Sample images for: {target_breed}", fontsize=16)
+plt.show()</code></pre></div>
+            </div>
+
+            <div class="note-card">
+              <strong>İzah:</strong> <span class="mpl-kbd">target_breed</span> dəyiş — eyni kodla fərqli cinslərdən nümunə gör.
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Cheat sheet -->
+      <div class="accordion-item anchor-pad" id="cheat">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c7">
+            Cheat sheet (qısa izahlar)
+          </button>
+        </h2>
+        <div id="c7" class="accordion-collapse collapse" data-bs-parent="#mplAccordion">
+          <div class="accordion-body">
+
+            <div class="note-card mb-3">
+              <div class="section-label mb-2">Pandas</div>
+              <ul class="mb-0">
+                <li><span class="mpl-kbd">value_counts()</span> — hər dəyərin sayını verir (məs: hər breed neçə dəfə var).</li>
+                <li><span class="mpl-kbd">unique()</span> — təkrarsız dəyərləri verir (məs: neçə fərqli breed var).</li>
+                <li><span class="mpl-kbd">head(n)</span> — ilk n sətri göstərir.</li>
+                <li><span class="mpl-kbd">loc[row, col]</span> — konkret hüceyrəni seçir.</li>
+                <li><span class="mpl-kbd">isin(list)</span> — “bu siyahının içində var?” filtridir.</li>
+                <li><span class="mpl-kbd">index</span> — nəticədə çox vaxt adlar index-də olur.</li>
+                <li><span class="mpl-kbd">index.tolist()</span> — index adlarını list edir.</li>
+                <li><span class="mpl-kbd">tolist()</span> — pandas sütununu Python list edir.</li>
+              </ul>
+            </div>
+
+            <div class="note-card">
+              <div class="section-label mb-2">Matplotlib</div>
+              <ul class="mb-0">
+                <li><span class="mpl-kbd">plt.figure(figsize=(w,h))</span> — ölçü.</li>
+                <li><span class="mpl-kbd">plt.title / xlabel / ylabel</span> — başlıq və ox adları.</li>
+                <li><span class="mpl-kbd">plt.xticks(rotation=...)</span> — x yazılarını döndürür.</li>
+                <li><span class="mpl-kbd">plt.subplot(r,c,i)</span> — grid-də i-ci yer.</li>
+                <li><span class="mpl-kbd">plt.imshow(img)</span> — şəkli göstərir.</li>
+                <li><span class="mpl-kbd">plt.axis("off")</span> — oxları gizlədir.</li>
+                <li><span class="mpl-kbd">plt.show()</span> — göstər.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /accordion -->
+
+  </div>
+</div>
+{% endblock %}

@@ -33,6 +33,9 @@ def get_pandas(request):
 def get_numpy(request):
     return render(request,"numpy.html")
 
+def get_matplotlib(request):
+    return render(request,"matplotlib.html")
+
 # Pages_________________________________________________
 
 def get_git(request):
