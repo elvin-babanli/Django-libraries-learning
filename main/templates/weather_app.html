@@ -1,298 +1,629 @@
-{% extends "base.html" %}
-{% block title %}GlobeWeather{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>GlobeWeather</title>
 
-{% block content %}
-<div class="layout">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
 
-  <!-- TOP -->
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo"></div>
-      <b>Weather</b>
-    </div>
+  <style>
+    :root{
+      --bg0:#05061a;
+      --bg1:#0a0c26;
 
-    <!-- PREFILL: city query varsa input dolu gəlsin -->
-    <input id="q" placeholder="Search city" autocomplete="off" value="{{ city|default:'' }}" />
-    <button class="btn" id="go" type="button">Search</button>
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.14);
 
-    <div class="statuspill" id="status">
-      <span class="spin"></span>
-      <span id="statusText">Ready</span>
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.62);
+
+      --a1:#06b6d4;
+      --a2:#7c3aed;
+
+      --shadow: 0 26px 90px rgba(0,0,0,.62);
+      --r: 22px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 820px at 20% 10%, rgba(124,58,237,.30), transparent 62%),
+        radial-gradient(900px 700px at 82% 18%, rgba(6,182,212,.20), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow:hidden; /* no scroll */
+    }
+
+    .vignette{
+      position:fixed; inset:-10%;
+      pointer-events:none;
+      background: radial-gradient(80% 60% at 50% 40%, transparent 40%, rgba(0,0,0,.62) 100%);
+      z-index:1;
+    }
+
+    #app{
+      position:relative;
+      width:100vw;height:100vh;
+      z-index:2;
+      padding: 16px;
+    }
+
+    .layout{
+      height: calc(100vh - 32px);
+      display:grid;
+      grid-template-rows: 54px 1fr 200px;
+      grid-template-columns: 1fr 420px;
+      gap: 14px;
+    }
+
+    .topbar{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--glass2), var(--glass));
+      backdrop-filter: blur(14px);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      min-height: 54px;
+    }
+
+    .brand{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .logo{
+      width:34px;height:34px;border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.22), transparent 48%),
+        linear-gradient(135deg, var(--a2), var(--a1));
+      box-shadow: 0 14px 34px rgba(6,182,212,.18);
+    }
+    .brand b{font-size:13px;letter-spacing:.35px;font-weight:950}
+
+    .topbar input{
+      flex:1;
+      height:44px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      outline:none;
+      padding:0 14px;
+      font-size:14px;
+    }
+    .topbar input:focus{
+      border-color: rgba(6,182,212,.65);
+      box-shadow: 0 0 0 4px rgba(6,182,212,.14);
+    }
+    .btn{
+      height:44px;
+      padding:0 16px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(6,182,212,.88));
+      color:white;
+      font-weight:950;
+      letter-spacing:.2px;
+      cursor:pointer;
+    }
+    .btn:active{ transform: scale(.985); }
+
+    .statuspill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      min-width: 110px;
+      justify-content: center;
+    }
+    .spin{
+      width:14px;height:14px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.18);
+      border-top-color: rgba(6,182,212,.9);
+      animation: s .8s linear infinite;
+      display:none;
+    }
+    .statuspill.loading .spin{ display:inline-block; }
+    @keyframes s{to{transform:rotate(360deg)}}
+    .err{ color:#fecaca; }
+
+    .map-panel{
+      grid-row: 2 / 4;
+      grid-column: 1 / 2;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      backdrop-filter: blur(14px);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    #map{ width:100%; height:100%; }
+
+    .right{
+      grid-row: 2 / 3;
+      grid-column: 2 / 3;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      overflow:hidden;
+    }
+    .right-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px;
+      border:1px solid var(--stroke);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      min-height: 54px;
+    }
+    .right-title b{ font-size: 13px; letter-spacing:.25px; }
+    .tag{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,.72);
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      padding: 6px 8px;
+      white-space:nowrap;
+    }
+
+    .citylist{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      overflow:hidden;
+    }
+
+    .citycard{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      border-radius: var(--r);
+      padding: 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      min-height: 86px;
+    }
+    .city-left{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .ico{
+      width:46px;height:46px;border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 22px;
+      flex:0 0 auto;
+    }
+    .city-meta{ min-width:0; }
+    .city-meta b{
+      display:block;
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing:.2px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .city-meta span{
+      display:block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .city-temp{
+      font-size: 38px;
+      font-weight: 950;
+      letter-spacing:.2px;
+      flex:0 0 auto;
+    }
+
+    .bottom{
+      grid-row: 3 / 4;
+      grid-column: 2 / 3;
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      backdrop-filter: blur(14px);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .bottom-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      min-height: 34px;
+    }
+    .bottom-head b{ font-size: 13px; letter-spacing:.25px; }
+
+    .leaflet-control-zoom a{
+      background: rgba(15,18,45,.88) !important;
+      color: rgba(255,255,255,.92) !important;
+      border: 1px solid rgba(255,255,255,.14) !important;
+      box-shadow: none !important;
+    }
+    .leaflet-control-attribution{
+      background: rgba(0,0,0,.35) !important;
+      color: rgba(255,255,255,.65) !important;
+      border-radius: 10px !important;
+    }
+
+    .pin-card{
+      width: 148px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(10,12,35,.88);
+      backdrop-filter: blur(10px);
+      padding: 12px 12px 10px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      color: rgba(255,255,255,.92);
+      text-align:center;
+    }
+
+    @media (max-width: 1100px){
+      #app{ padding: 12px; }
+      .layout{
+        height: calc(100vh - 24px);
+        grid-template-columns: 1fr 360px;
+        grid-template-rows: 54px 1fr 176px;
+      }
+    }
+    @media (max-width: 980px){
+      body{ overflow:auto; }
+      .layout{
+        height:auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: 54px 520px auto auto;
+      }
+      .map-panel{ grid-row: 2; grid-column: 1; height:520px; }
+      .right{ grid-row: 3; grid-column: 1; }
+      .bottom{ grid-row: 4; grid-column: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="vignette"></div>
+
+  <div id="app">
+    <div class="layout">
+
+      <!-- TOP -->
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo"></div>
+          <b>Weather</b>
+        </div>
+
+        <!-- Prefill: view GET city göndərirsə -->
+        <input id="q" placeholder="Search city" autocomplete="off" value="{{ city|default:'' }}" />
+        <button class="btn" id="go" type="button">Search</button>
+
+        <div class="statuspill" id="status">
+          <span class="spin"></span>
+          <span id="statusText">Ready</span>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <section class="map-panel">
+        <div id="map" aria-label="Map"></div>
+      </section>
+
+      <!-- RIGHT -->
+      <aside class="right">
+        <div class="right-title">
+          <b>Next 4 days</b>
+          <span class="tag" id="rtag">—</span>
+        </div>
+
+        <div class="citylist" id="daylist">
+          <div class="citycard">
+            <div class="city-left">
+              <div class="ico">⛅</div>
+              <div class="city-meta">
+                <b>Search a city</b>
+                <span>We’ll show next 4 days here</span>
+              </div>
+            </div>
+            <div class="city-temp">—</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- BOTTOM -->
+      <section class="bottom">
+        <div class="bottom-head">
+          <b>Sun • Time</b>
+          <span class="tag" id="updated">—</span>
+        </div>
+
+        <div
+          style="
+            border:1px solid rgba(255,255,255,.14);
+            background: rgba(255,255,255,.06);
+            border-radius: 16px;
+            padding: 10px;
+            display:flex;
+            flex-direction:column;
+            gap:8px;
+            overflow:hidden;
+          "
+        >
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+            <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Local time</span>
+            <b id="localtime" style="font-size:14px; letter-spacing:.2px;">—</b>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+            <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Sunrise</span>
+            <b id="sunrise" style="font-size:14px; letter-spacing:.2px;">—</b>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+            <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Sunset</span>
+            <b id="sunset" style="font-size:14px; letter-spacing:.2px;">—</b>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
+            <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Day length</span>
+            <b id="daylen" style="font-size:14px; letter-spacing:.2px;">—</b>
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 
-  <!-- MAP -->
-  <section class="map-panel">
-    <div id="map" aria-label="Map"></div>
-  </section>
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
 
-  <!-- RIGHT: Next 4 days stacked -->
-  <aside class="right">
-    <div class="right-title">
-      <b>Next 4 days</b>
-      <span class="tag" id="rtag">—</span>
-    </div>
+  <script>
+  (() => {
+    const $ = (id) => document.getElementById(id);
 
-    <div class="citylist" id="daylist">
-      <div class="citycard">
-        <div class="city-left">
-          <div class="ico">⛅</div>
-          <div class="city-meta">
-            <b>Search a city</b>
-            <span>We’ll show next 4 days here</span>
+    const statusEl = $("status");
+    const statusText = $("statusText");
+
+    function setStatus(text, mode="ready"){
+      statusText.textContent = text;
+      statusEl.classList.toggle("loading", mode === "loading");
+      statusText.classList.toggle("err", mode === "error");
+    }
+
+    function nowTime(){
+      return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    }
+
+    function fmtLocalClockFromOffset(offsetSeconds){
+      const nowUtcMs = Date.now();
+      const localMs = nowUtcMs + (offsetSeconds * 1000);
+      const d = new Date(localMs);
+      return d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    }
+
+    const map = L.map("map", {
+      zoomControl:true,
+      preferCanvas:true,
+      minZoom: 2
+    }).setView([20,10], 2);
+
+    const worldBounds = L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180));
+    map.setMaxBounds(worldBounds);
+    map.on("drag", () => map.panInsideBounds(worldBounds, { animate:false }));
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    let pinMarker = null;
+
+    function makePinCard(minT, maxT, desc, hum, wind){
+      return `
+        <div class="pin-card" style="width: 180px; text-align:left; padding:12px 12px 12px;">
+          <div style="font-weight:950; font-size:22px; letter-spacing:.2px;">
+            ${Math.round(minT)}°/${Math.round(maxT)}°
+          </div>
+          <div style="margin-top:6px; font-size:12px; color:rgba(255,255,255,.78);">
+            ${desc || "—"}
+          </div>
+          <div style="margin-top:8px; font-size:12px; color:rgba(255,255,255,.78);">
+            Hum ${hum ?? "—"}%
+          </div>
+          <div style="margin-top:4px; font-size:12px; color:rgba(255,255,255,.78);">
+            Wind ${wind ?? "—"} m/s
           </div>
         </div>
-        <div class="city-temp">—</div>
-      </div>
-    </div>
-  </aside>
+      `;
+    }
 
-  <!-- BOTTOM: Sun • Time -->
-  <section class="bottom">
-    <div class="bottom-head">
-      <b>Sun • Time</b>
-      <span class="tag" id="updated">—</span>
-    </div>
+    function setPin(lat, lon, minT, maxT, desc, hum, wind){
+      const icon = L.divIcon({
+        className: "",
+        html: makePinCard(minT, maxT, desc, hum, wind),
+        iconSize: [180, 118],
+        iconAnchor: [90, 118]
+      });
 
-    <div
-      style="
-        border:1px solid rgba(255,255,255,.14);
-        background: rgba(255,255,255,.06);
-        border-radius: 16px;
-        padding: 10px;
-        display:flex;
-        flex-direction:column;
-        gap:8px;
-        overflow:hidden;
-      "
-    >
-      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
-        <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Local time</span>
-        <b id="localtime" style="font-size:14px; letter-spacing:.2px;">—</b>
-      </div>
+      if (pinMarker) map.removeLayer(pinMarker);
+      pinMarker = L.marker([lat, lon], { icon }).addTo(map);
+    }
 
-      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
-        <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Sunrise</span>
-        <b id="sunrise" style="font-size:14px; letter-spacing:.2px;">—</b>
-      </div>
+    async function apiSearch(city){
+      // ✅ Portfolio-da URL dəyişsə də qırılmasın deyə:
+      const endpoint = "{% url 'weather_api' %}";
+      const res = await fetch(`${endpoint}?city=${encodeURIComponent(city)}`);
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok){
+        const msg = data?.error || "Request failed";
+        throw new Error(msg);
+      }
+      return data;
+    }
 
-      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
-        <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Sunset</span>
-        <b id="sunset" style="font-size:14px; letter-spacing:.2px;">—</b>
-      </div>
+    function dayLabel(iso){
+      const d = new Date(iso + "T00:00:00");
+      return d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" });
+    }
 
-      <div style="display:flex; justify-content:space-between; gap:10px; align-items:center;">
-        <span style="font-size:12px; color:rgba(255,255,255,.62); font-family: ui-monospace,monospace;">Day length</span>
-        <b id="daylen" style="font-size:14px; letter-spacing:.2px;">—</b>
-      </div>
-    </div>
-  </section>
+    function iconFor(desc=""){
+      const t = (desc || "").toLowerCase();
+      if (t.includes("rain")) return "🌧️";
+      if (t.includes("cloud")) return "☁️";
+      if (t.includes("snow")) return "🌨️";
+      if (t.includes("storm") || t.includes("thunder")) return "⛈️";
+      if (t.includes("clear")) return "☀️";
+      return "⛅";
+    }
 
-</div>
+    function renderNext4Days(daily){
+      const list = $("daylist");
+      list.innerHTML = "";
 
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-  crossorigin=""
-></script>
+      const next = (daily || []).slice(1, 5);
 
-<script>
-(() => {
-  const $ = (id) => document.getElementById(id);
+      if (!next.length){
+        const el = document.createElement("div");
+        el.className = "citycard";
+        el.innerHTML = `
+          <div class="city-left">
+            <div class="ico">⛅</div>
+            <div class="city-meta">
+              <b>No forecast</b>
+              <span>Try another city</span>
+            </div>
+          </div>
+          <div class="city-temp">—</div>
+        `;
+        list.appendChild(el);
+        return;
+      }
 
-  const statusEl = $("status");
-  const statusText = $("statusText");
+      next.forEach(d => {
+        const el = document.createElement("div");
+        el.className = "citycard";
+        el.innerHTML = `
+          <div class="city-left">
+            <div class="ico">${iconFor(d.description)}</div>
+            <div class="city-meta">
+              <b>${dayLabel(d.date)}</b>
+              <span>${(d.description || "—")} • Hum ${d.humidity}% • Wind ${d.wind_speed} m/s</span>
+            </div>
+          </div>
+          <div class="city-temp">${Math.round(d.min)}°/${Math.round(d.max)}°</div>
+        `;
+        list.appendChild(el);
+      });
+    }
 
-  function setStatus(text, mode="ready"){
-    statusText.textContent = text;
-    statusEl.classList.toggle("loading", mode === "loading");
-    statusText.classList.toggle("err", mode === "error");
-  }
+    function renderSunPanel(c, sun){
+      $("updated").textContent = `Updated ${nowTime()}`;
 
-  function nowTime(){
-    return new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-  }
+      const offset = Number(c.timezone || 0);
+      $("localtime").textContent = fmtLocalClockFromOffset(offset);
 
-  function fmtLocalClockFromOffset(offsetSeconds){
-    const nowUtcMs = Date.now();
-    const localMs = nowUtcMs + (offsetSeconds * 1000);
-    const d = new Date(localMs);
-    return d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-  }
+      $("sunrise").textContent = (sun && sun.sunrise) ? sun.sunrise : "—";
+      $("sunset").textContent  = (sun && sun.sunset)  ? sun.sunset  : "—";
+      $("daylen").textContent  = (sun && sun.day_length) ? sun.day_length : "—";
+    }
 
-  const map = L.map("map", {
-    zoomControl:true,
-    preferCanvas:true,
-    minZoom: 2
-  }).setView([20,10], 2);
+    async function search(){
+      const city = $("q").value.trim();
+      if(!city){
+        setStatus("Type a city name");
+        return;
+      }
 
-  const worldBounds = L.latLngBounds(L.latLng(-85, -180), L.latLng(85, 180));
-  map.setMaxBounds(worldBounds);
-  map.on("drag", () => map.panInsideBounds(worldBounds, { animate:false }));
+      try{
+        setStatus("Searching…", "loading");
+        const data = await apiSearch(city);
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
+        const c = data.current;
 
-  let pinMarker = null;
+        setPin(
+          c.lat, c.lon,
+          c.temp_min, c.temp_max,
+          c.description,
+          c.humidity,
+          c.wind_speed
+        );
 
-  function makePinCard(minT, maxT, desc, hum, wind){
-    return `
-      <div class="pin-card" style="width: 180px; text-align:left; padding:12px 12px 12px;">
-        <div style="font-weight:950; font-size:22px; letter-spacing:.2px;">
-          ${Math.round(minT)}°/${Math.round(maxT)}°
-        </div>
-        <div style="margin-top:6px; font-size:12px; color:rgba(255,255,255,.78);">
-          ${desc || "—"}
-        </div>
-        <div style="margin-top:8px; font-size:12px; color:rgba(255,255,255,.78);">
-          Hum ${hum ?? "—"}%
-        </div>
-        <div style="margin-top:4px; font-size:12px; color:rgba(255,255,255,.78);">
-          Wind ${wind ?? "—"} m/s
-        </div>
-      </div>
-    `;
-  }
+        map.flyTo([c.lat, c.lon], 6, { animate:true, duration: 1.2 });
 
-  function setPin(lat, lon, minT, maxT, desc, hum, wind){
-    const icon = L.divIcon({
-      className: "",
-      html: makePinCard(minT, maxT, desc, hum, wind),
-      iconSize: [180, 118],
-      iconAnchor: [90, 118]
+        renderNext4Days(data.daily);
+        renderSunPanel(c, data.sun || null);
+
+        $("rtag").textContent = `${c.city}, ${c.country}`;
+        setStatus("Done");
+      }catch(e){
+        console.error(e);
+        setStatus("Error: " + (e?.message || e), "error");
+      }
+    }
+
+    $("go").addEventListener("click", () => search());
+    $("q").addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){
+        e.preventDefault();
+        search();
+      }
     });
 
-    if (pinMarker) map.removeLayer(pinMarker);
-    pinMarker = L.marker([lat, lon], { icon }).addTo(map);
-  }
-
-  async function apiSearch(city){
- 
-    const endpoint = "{% url 'weather_api' %}";
-    const res = await fetch(`${endpoint}?city=${encodeURIComponent(city)}`);
-    const data = await res.json().catch(() => ({}));
-    if(!res.ok){
-      const msg = data?.error || "Request failed";
-      throw new Error(msg);
-    }
-    return data;
-  }
-
-  function dayLabel(iso){
-    const d = new Date(iso + "T00:00:00");
-    return d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" });
-  }
-
-  function iconFor(desc=""){
-    const t = (desc || "").toLowerCase();
-    if (t.includes("rain")) return "🌧️";
-    if (t.includes("cloud")) return "☁️";
-    if (t.includes("snow")) return "🌨️";
-    if (t.includes("storm") || t.includes("thunder")) return "⛈️";
-    if (t.includes("clear")) return "☀️";
-    return "⛅";
-  }
-
-  function renderNext4Days(daily){
-    const list = $("daylist");
-    list.innerHTML = "";
-
-    const next = (daily || []).slice(1, 5);
-
-    if (!next.length){
-      const el = document.createElement("div");
-      el.className = "citycard";
-      el.innerHTML = `
-        <div class="city-left">
-          <div class="ico">⛅</div>
-          <div class="city-meta">
-            <b>No forecast</b>
-            <span>Try another city</span>
-          </div>
-        </div>
-        <div class="city-temp">—</div>
-      `;
-      list.appendChild(el);
-      return;
-    }
-
-    next.forEach(d => {
-      const el = document.createElement("div");
-      el.className = "citycard";
-      el.innerHTML = `
-        <div class="city-left">
-          <div class="ico">${iconFor(d.description)}</div>
-          <div class="city-meta">
-            <b>${dayLabel(d.date)}</b>
-            <span>${(d.description || "—")} • Hum ${d.humidity}% • Wind ${d.wind_speed} m/s</span>
-          </div>
-        </div>
-        <div class="city-temp">${Math.round(d.min)}°/${Math.round(d.max)}°</div>
-      `;
-      list.appendChild(el);
-    });
-  }
-
-  function renderSunPanel(c, sun){
-    $("updated").textContent = `Updated ${nowTime()}`;
-
-    const offset = Number(c.timezone || 0);
-    $("localtime").textContent = fmtLocalClockFromOffset(offset);
-
-    $("sunrise").textContent = (sun && sun.sunrise) ? sun.sunrise : "—";
-    $("sunset").textContent  = (sun && sun.sunset)  ? sun.sunset  : "—";
-    $("daylen").textContent  = (sun && sun.day_length) ? sun.day_length : "—";
-  }
-
-  async function search(){
-    const city = $("q").value.trim();
-    if(!city){
-      setStatus("Type a city name");
-      return;
-    }
-
-    try{
-      setStatus("Searching…", "loading");
-      const data = await apiSearch(city);
-
-      const c = data.current;
-
-      setPin(
-        c.lat, c.lon,
-        c.temp_min, c.temp_max,
-        c.description,
-        c.humidity,
-        c.wind_speed
-      );
-
-      map.flyTo([c.lat, c.lon], 6, { animate:true, duration: 1.2 });
-
-      renderNext4Days(data.daily);
-      renderSunPanel(c, data.sun || null);
-
-      $("rtag").textContent = `${c.city}, ${c.country}`;
-      setStatus("Done");
-    }catch(e){
-      console.error(e);
-      setStatus("Error: " + (e?.message || e), "error");
-    }
-  }
-
-  $("go").addEventListener("click", () => search());
-  $("q").addEventListener("keydown", (e) => {
-    if(e.key === "Enter"){
-      e.preventDefault();
+    // city query varsa auto-run
+    const initial = $("q").value.trim();
+    if(initial){
       search();
     }
-  });
 
-  const initial = $("q").value.trim();
-  if(initial){
-    search();
-  }
-
-})();
-</script>
-{% endblock %}
+  })();
+  </script>
+</body>
+</html>
