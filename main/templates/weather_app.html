@@ -11,44 +11,35 @@
 
 <style>
   /* =========================================================
-     ✅ PAGE-LEVEL SCROLL OFF (only on this page)
-     - No vertical scroll
-     - No horizontal scroll
-     - Also kill "gap" caused by base main padding/margin
+     ✅ NO PAGE SCROLL (only on this page)
      ========================================================= */
   html, body{
-    height: 100% !important;
-    overflow: hidden !important;      /* ✅ no up/down, no left/right */
-    overscroll-behavior: none !important;
+    height:100% !important;
+    overflow:hidden !important;
+    overscroll-behavior:none !important;
   }
-  body{
-    margin: 0 !important;
-  }
+  body{ margin:0 !important; }
 
-  /* base-də <main> var dedin — padding/margin boşluğunu sıfırla */
-  main{
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* base bəzən container/wrapper verir — onlardan gələn gap-i də sıfırla */
-  .container, .content, .page-content, .main, #main{
-    margin: 0 !important;
-    padding: 0 !important;
+  /* base main/container max-width / padding boşluqlarını bu səhifədə sıfırla */
+  main{ margin:0 !important; padding:0 !important; max-width:none !important; width:100% !important; }
+  .container, .content, .page-content, .main, #main, .wrapper, .page-wrapper{
+    margin:0 !important;
+    padding:0 !important;
+    max-width:none !important;
+    width:100% !important;
   }
 
   /* =========================================================
-     ✅ FULL-BLEED wrapper (no horizontal overflow)
+     ✅ FULL WIDTH WRAP (no horizontal overflow)
      ========================================================= */
   .gw-wrap{
-    width: 100% !important;          /* ✅ 100vw yox, horizontal scroll yaratmasın */
-    margin: 0 !important;
-    padding: 0 !important;
-    position: relative;
+    width:100% !important;
+    margin:0 !important;
+    padding:0 !important;
   }
 
   /* =========================================================
-     ✅ Weather component (Kamran look)
+     ✅ Weather component
      ========================================================= */
   .gw-root{
     --bg0:#05061a;
@@ -73,23 +64,22 @@
     font-family: var(--sans);
     color: var(--text);
 
-    width: 100%;
-    height: 60vh;                    /* JS bunu dəqiq fit edəcək */
-    min-height: 520px;
+    width:100%;
+    height:60vh;          /* JS sets perfect height */
+    min-height:520px;
 
-    padding: 16px;
-    box-sizing: border-box;
+    padding:16px;
+    box-sizing:border-box;
 
     background:
       radial-gradient(1200px 820px at 20% 10%, rgba(124,58,237,.30), transparent 62%),
       radial-gradient(900px 700px at 82% 18%, rgba(6,182,212,.20), transparent 60%),
       linear-gradient(180deg, var(--bg0), var(--bg1));
 
-    border-radius: 0;                /* ✅ no gaps */
-    overflow: hidden;
-    position: relative;
+    border-radius:0;
+    overflow:hidden;
+    position:relative;
   }
-
   .gw-root *{ box-sizing:border-box; }
 
   .gw-vignette{
@@ -106,16 +96,31 @@
     height:100%;
   }
 
+  /* =========================================================
+     ✅ DESKTOP / LAPTOP: make it WIDE-FIT
+     - right column gets bigger
+     - gap removed visually by using more space
+     ========================================================= */
   .gw-layout{
-    height: 100%;
+    height:100%;
     display:grid;
     grid-template-rows: 54px 1fr 200px;
-    grid-template-columns: 1fr 420px;
-    gap: 14px;
+    grid-template-columns: 1fr 520px;   /* ✅ was 420 -> now wider */
+    gap:14px;
+    max-width: 1600px;                  /* ✅ prevents ultra-wide ugliness */
+    margin: 0 auto;                     /* ✅ centered */
+  }
+
+  /* on huge screens use more width */
+  @media (min-width: 1600px){
+    .gw-layout{
+      max-width: 1840px;
+      grid-template-columns: 1fr 600px; /* ✅ even wider */
+    }
   }
 
   .gw-topbar{
-    grid-column: 1 / -1;
+    grid-column:1 / -1;
     display:flex;
     align-items:center;
     gap:10px;
@@ -123,9 +128,10 @@
     border:1px solid var(--stroke);
     background: linear-gradient(180deg, var(--glass2), var(--glass));
     backdrop-filter: blur(14px);
-    border-radius: 999px;
+    border-radius:999px;
     box-shadow: var(--shadow);
-    min-height: 54px;
+    min-height:54px;
+    min-width:0;
   }
 
   .gw-brand{
@@ -142,12 +148,12 @@
       linear-gradient(135deg, var(--a2), var(--a1));
     box-shadow: 0 14px 34px rgba(6,182,212,.18);
   }
-  .gw-brand b{font-size:13px;letter-spacing:.35px;font-weight:950}
+  .gw-brand b{ font-size:13px; letter-spacing:.35px; font-weight:950; }
 
   .gw-topbar input{
     flex:1;
     height:44px;
-    border-radius: 999px;
+    border-radius:999px;
     border:1px solid rgba(255,255,255,.16);
     background: rgba(255,255,255,.06);
     color: var(--text);
@@ -164,16 +170,15 @@
   .gw-btn{
     height:44px;
     padding:0 16px;
-    border-radius: 999px;
+    border-radius:999px;
     border:1px solid rgba(255,255,255,.18);
     background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(6,182,212,.88));
     color:white;
     font-weight:950;
     letter-spacing:.2px;
     cursor:pointer;
-    flex: 0 0 auto;
+    flex:0 0 auto;
   }
-  .gw-btn:active{ transform: scale(.985); }
 
   .gw-statuspill{
     display:flex;
@@ -184,11 +189,11 @@
     border:1px solid rgba(255,255,255,.14);
     background: rgba(255,255,255,.06);
     color: var(--muted);
-    font-size: 12px;
-    white-space: nowrap;
-    min-width: 120px;
-    justify-content: center;
-    flex: 0 0 auto;
+    font-size:12px;
+    white-space:nowrap;
+    min-width:120px;
+    justify-content:center;
+    flex:0 0 auto;
   }
   .gw-spin{
     width:14px;height:14px;border-radius:50%;
@@ -202,8 +207,8 @@
   .gw-err{ color:#fecaca; }
 
   .gw-map-panel{
-    grid-row: 2 / 4;
-    grid-column: 1 / 2;
+    grid-row:2 / 4;
+    grid-column:1 / 2;
     border:1px solid var(--stroke);
     background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
     backdrop-filter: blur(14px);
@@ -211,19 +216,20 @@
     box-shadow: var(--shadow);
     overflow:hidden;
     position:relative;
-    min-width: 0;
+    min-width:0;
   }
   #gw-map{ width:100%; height:100%; }
 
   .gw-right{
-    grid-row: 2 / 3;
-    grid-column: 2 / 3;
+    grid-row:2 / 3;
+    grid-column:2 / 3;
     display:flex;
     flex-direction:column;
-    gap: 12px;
+    gap:12px;
     overflow:hidden;
-    min-width: 0;
+    min-width:0;
   }
+
   .gw-right-title{
     display:flex;
     align-items:center;
@@ -235,18 +241,18 @@
     background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
     backdrop-filter: blur(14px);
     box-shadow: var(--shadow);
-    min-height: 54px;
+    min-height:54px;
   }
-  .gw-right-title b{ font-size: 13px; letter-spacing:.25px; }
+  .gw-right-title b{ font-size:13px; letter-spacing:.25px; }
 
   .gw-tag{
     font-family: var(--mono);
-    font-size: 11px;
+    font-size:11px;
     color: rgba(255,255,255,.72);
     border:1px solid rgba(255,255,255,.16);
     background: rgba(255,255,255,.06);
-    border-radius: 999px;
-    padding: 6px 8px;
+    border-radius:999px;
+    padding:6px 8px;
     white-space:nowrap;
   }
 
@@ -254,81 +260,81 @@
     flex:1;
     display:flex;
     flex-direction:column;
-    gap: 12px;
+    gap:12px;
     overflow:hidden;
-    min-width: 0;
+    min-width:0;
   }
 
   .gw-citycard{
     border:1px solid rgba(255,255,255,.14);
     background: rgba(255,255,255,.06);
     border-radius: var(--r);
-    padding: 16px;
+    padding:16px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap: 14px;
-    min-height: 86px;
-    min-width: 0;
+    gap:14px;
+    min-height:86px;
+    min-width:0;
   }
   .gw-city-left{
     display:flex;
     align-items:center;
-    gap: 12px;
-    min-width: 0;
+    gap:12px;
+    min-width:0;
   }
   .gw-ico{
-    width:46px;height:46px;border-radius: 18px;
+    width:46px;height:46px;border-radius:18px;
     border:1px solid rgba(255,255,255,.14);
     background: rgba(0,0,0,.18);
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size: 22px;
+    font-size:22px;
     flex:0 0 auto;
   }
   .gw-city-meta{ min-width:0; }
   .gw-city-meta b{
     display:block;
-    font-size: 18px;
-    font-weight: 950;
+    font-size:18px;
+    font-weight:950;
     letter-spacing:.2px;
-    white-space: nowrap;
+    white-space:nowrap;
     overflow:hidden;
-    text-overflow: ellipsis;
+    text-overflow:ellipsis;
   }
   .gw-city-meta span{
     display:block;
-    margin-top: 4px;
+    margin-top:4px;
     color: var(--muted);
     font-family: var(--mono);
-    font-size: 12px;
-    white-space: nowrap;
+    font-size:12px;
+    white-space:nowrap;
     overflow:hidden;
-    text-overflow: ellipsis;
+    text-overflow:ellipsis;
   }
   .gw-city-temp{
-    font-size: 38px;
-    font-weight: 950;
+    font-size:38px;
+    font-weight:950;
     letter-spacing:.2px;
     flex:0 0 auto;
-    white-space: nowrap;
+    white-space:nowrap;
   }
 
   .gw-bottom{
-    grid-row: 3 / 4;
-    grid-column: 2 / 3;
+    grid-row:3 / 4;
+    grid-column:2 / 3;
     border:1px solid var(--stroke);
     background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
     backdrop-filter: blur(14px);
     border-radius: var(--r);
     box-shadow: var(--shadow);
-    padding: 12px;
+    padding:12px;
     overflow:hidden;
     display:flex;
     flex-direction:column;
-    gap: 10px;
-    min-width: 0;
+    gap:10px;
+    min-width:0;
   }
 
   .gw-bottom-head{
@@ -336,11 +342,10 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    min-height: 34px;
+    min-height:34px;
   }
-  .gw-bottom-head b{ font-size: 13px; letter-spacing:.25px; }
+  .gw-bottom-head b{ font-size:13px; letter-spacing:.25px; }
 
-  /* Leaflet theme */
   .gw-root .leaflet-control-zoom a{
     background: rgba(15,18,45,.88) !important;
     color: rgba(255,255,255,.92) !important;
@@ -365,32 +370,85 @@
     text-align:left;
   }
 
-  /* tablet */
-  @media (max-width: 1100px){
-    .gw-layout{
-      grid-template-columns: 1fr 360px;
-      grid-template-rows: 54px 1fr 176px;
-    }
-  }
-
-  /* mobile: stacked layout, NO page scroll (still fits via JS height) */
+  /* =========================================================
+     ✅ MOBILE: new design
+     - Topbar becomes 2 rows
+     - Right panel becomes "cards grid"
+     - Bottom is compact
+     ========================================================= */
   @media (max-width: 980px){
     .gw-root{ padding: 12px; }
+
     .gw-layout{
       grid-template-columns: 1fr;
-      grid-template-rows: 54px 520px auto auto;
-      height: 100%;
+      grid-template-rows: auto 360px auto auto;
+      gap: 12px;
+      max-width: none;
+      margin: 0;
     }
-    .gw-map-panel{ grid-row: 2; grid-column: 1; height: 520px; }
-    .gw-right{ grid-row: 3; grid-column: 1; }
-    .gw-bottom{ grid-row: 4; grid-column: 1; }
+
+    /* TOPBAR -> 2 lines */
+    .gw-topbar{
+      border-radius: 18px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      gap: 10px;
+      padding: 12px;
+      min-height: unset;
+    }
+    .gw-brand{ grid-column: 1 / -1; }
+    .gw-topbar input{ grid-column: 1 / 2; }
+    .gw-btn{ grid-column: 2 / 3; }
+    .gw-statuspill{
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+      min-width: 0;
+      border-radius: 14px;
+      padding: 10px 12px;
+    }
+
+    .gw-map-panel{
+      grid-row: 2;
+      grid-column: 1;
+      height: 360px;
+      border-radius: 18px;
+    }
+
+    .gw-right{
+      grid-row: 3;
+      grid-column: 1;
+      overflow: hidden;
+    }
+
+    .gw-right-title{
+      border-radius: 18px;
+    }
+
+    /* right list becomes flexible scroll area inside component (NOT page scroll) */
+    .gw-citylist{
+      overflow:auto;
+      scrollbar-width: none;
+    }
+    .gw-citylist::-webkit-scrollbar{ width: 0; height: 0; }
+
+    .gw-citycard{
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .gw-city-temp{ font-size: 32px; }
+
+    .gw-bottom{
+      grid-row: 4;
+      grid-column: 1;
+      border-radius: 18px;
+    }
   }
 
   @media (max-width: 520px){
-    .gw-layout{ grid-template-rows: 54px 420px auto auto; }
-    .gw-map-panel{ height: 420px; }
-    .gw-city-temp{ font-size: 30px; }
-    .gw-statuspill{ min-width: 96px; }
+    .gw-layout{ grid-template-rows: auto 300px auto auto; }
+    .gw-map-panel{ height: 300px; }
+    .gw-city-temp{ font-size: 28px; }
   }
 </style>
 
@@ -493,7 +551,6 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
-  /* ✅ Fit: navbar altında başlayan yeri tapır, qalan ekranı tutur (scroll yok) */
   function fitWeatherToViewport(){
     const root = document.getElementById("gwRoot");
     if(!root) return;
@@ -503,7 +560,7 @@
     const viewportH = vv ? vv.height : window.innerHeight;
 
     const top = rect.top;
-    const h = Math.max(520, Math.floor(viewportH - top)); // ✅ no extra gap
+    const h = Math.max(520, Math.floor(viewportH - top));
     root.style.height = h + "px";
   }
 
@@ -550,7 +607,6 @@
     attribution: '&copy; OpenStreetMap'
   }).addTo(map);
 
-  /* ✅ When root height changes, Leaflet needs this */
   const ro = new ResizeObserver(() => map.invalidateSize(true));
   const root = document.getElementById("gwRoot");
   if(root) ro.observe(root);
